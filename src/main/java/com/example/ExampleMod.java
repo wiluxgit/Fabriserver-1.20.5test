@@ -1,27 +1,22 @@
 package com.example;
 
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.minecraft.command.argument.EntityArgumentType;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registry;
 import net.minecraft.screen.*;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.example.FakeRecipeHandler.getFakeRecipePacket;
+import static com.example.FakeRecipeHandler.getRealRecipePacket;
 
 public class ExampleMod implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
@@ -39,35 +34,38 @@ public class ExampleMod implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
 				net.minecraft.server.command.CommandManager.literal("foo").executes(this::foo)
 		));
+		ServerLifecycleEvents.SERVER_STARTED.register(FakeRecipeHandler::new);
 	}
+
 	public int foo(CommandContext<ServerCommandSource> context) {
 		context.getSource().sendFeedback(() -> Text.literal("hello world"), false);
 
 		ServerPlayerEntity splayer = context.getSource().getPlayer();
-		var screenHandler = new SimpleNamedScreenHandlerFactory(
-				(syncId, playerInventory, player) -> new MyStonecutterScreenHandler(0, player.getInventory()),
-				Text.literal("Title")
+
+		// Spoof the client to override all recipes with some dummy stoneCutting recipes
+		splayer.networkHandler.sendPacket(getFakeRecipePacket());
+		var screenHandler = new SimpleNamedScreenHandlerFactory( // There should be a better way yo pick sync ids
+				(syncId, playerInventory, player) -> new TerminalScreenHandler(player.playerScreenHandler.syncId, player.getInventory(), splayer),
+				Text.literal("Terminal")
 		);
 		splayer.openHandledScreen(screenHandler);
-		splayer.currentScreenHandler.setStackInSlot(0, 0, new ItemStack(Items.DIAMOND_SWORD));
+		splayer.currentScreenHandler.setStackInSlot(0, 0, new ItemStack(FakeRecipeHandler.INPUT_ITEM));
 
 		return 1;
 	}
-	public class MyStonecutterScreenHandler extends StonecutterScreenHandler {
-		public MyStonecutterScreenHandler(int syncId, PlayerInventory playerInventory) {
+
+	public class TerminalScreenHandler extends StonecutterScreenHandler {
+		private final ServerPlayerEntity playerThatOpened;
+
+		public TerminalScreenHandler(int syncId, PlayerInventory playerInventory, ServerPlayerEntity playerThatOpened) {
 			super(syncId, playerInventory);
+			this.playerThatOpened = playerThatOpened;
 		}
 
 		@Override
-		public void updateSyncHandler(ScreenHandlerSyncHandler screenHandler) {
-			super.updateSyncHandler(screenHandler);
-			System.out.println(">>>>>>>>>>>>> updateSyncHandler");
-		}
-
-		@Override
-		public void addListener(ScreenHandlerListener screenHandler) {
-			super.addListener(screenHandler);
-			System.out.println(">>>>>>>>>>>>> addListener");
+		public void onClosed(PlayerEntity player) {
+			super.onClosed(player);
+			this.playerThatOpened.networkHandler.sendPacket(getRealRecipePacket());
 		}
 	}
 }
