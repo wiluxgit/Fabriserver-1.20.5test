@@ -44,8 +44,8 @@ public class ExampleMod implements ModInitializer {
 
 		// Spoof the client to override all recipes with some dummy stoneCutting recipes
 		splayer.networkHandler.sendPacket(getFakeRecipePacket());
-		var screenHandler = new SimpleNamedScreenHandlerFactory( 
-				(syncId, playerInventory, player) -> new TerminalScreenHandler(syncId, player.getInventory(), splayer),
+		var screenHandler = new SimpleNamedScreenHandlerFactory(
+				(syncId, playerInventory, player) -> new TerminalScreenHandler(syncId, playerInventory, splayer),
 				Text.literal("Terminal")
 		);
 		splayer.openHandledScreen(screenHandler);
