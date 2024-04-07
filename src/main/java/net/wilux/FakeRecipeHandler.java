@@ -1,4 +1,4 @@
-package com.example;
+package net.wilux;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -27,16 +27,16 @@ public class FakeRecipeHandler {
 
     private static RecipeEntry barrierOutput(ItemStack output) {
         StonecuttingRecipe fakeStonecutterRecipe = new StonecuttingRecipe("dummy_group", Ingredient.ofItems(INPUT_ITEM), output);
-        RecipeEntry fakeRecipe = new RecipeEntry(new Identifier("wx:"+output.getTranslationKey()), fakeStonecutterRecipe);
+        RecipeEntry fakeRecipe = new RecipeEntry(new Identifier(ExampleMod.MOD_ID,output.getTranslationKey()), fakeStonecutterRecipe);
         return fakeRecipe;
     }
 
-    public static SynchronizeRecipesS2CPacket getFakeRecipePacket() {
+    public static SynchronizeRecipesS2CPacket getFakeRecipePacket(int amount) {
         Collection<RecipeEntry<?>> recipes = Arrays.asList(
-                barrierOutput(new ItemStack(Items.STONE, 2)),
-                barrierOutput(new ItemStack(Items.COBBLESTONE, 4)),
-                barrierOutput(new ItemStack(Items.DIORITE, 8)),
-                barrierOutput(new ItemStack(Items.DIRT, 16)),
+                barrierOutput(new ItemStack(Items.STONE, amount)),
+                barrierOutput(new ItemStack(Items.COBBLESTONE, amount)),
+                barrierOutput(new ItemStack(Items.DIORITE, amount)),
+                barrierOutput(new ItemStack(Items.DIRT, amount)),
                 barrierOutput(new ItemStack(Items.GLASS, 64)),
                 barrierOutput(new ItemStack(Items.GRANITE, 64)),
                 barrierOutput(new ItemStack(Items.SPONGE, 64)),

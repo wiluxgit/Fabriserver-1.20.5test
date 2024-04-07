@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ExampleMod"
+          "net.wilux.ExampleMod"
 		],
 		"client": [
-			"com.example.ExampleModClient"
+			"net.wilux.ExampleModClient"
 		]
 	},
 	"mixins": [
@@ -33,7 +33,10 @@
 		"fabricloader": ">=0.15.9",
 		"minecraft": "~1.20.4",
 		"java": ">=17",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"polymer-core": ">=0.7.7",
+		"polymer-resource-pack": ">=0.7.7",
+		"polymer-blocks": ">=0.7.7"
 	},
 	"suggests": {
 		"another-mod": "*"

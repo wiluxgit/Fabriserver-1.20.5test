@@ -1,4 +1,4 @@
-package com.example;
+package net.wilux;
 
 import net.fabricmc.api.ClientModInitializer;
 
