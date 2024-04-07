@@ -160,13 +160,12 @@ public class Terminal {
         void populateResult() {
             if (!this.initContents.items.isEmpty() && this.isInBounds(this.selectedIndex.get())) {
                 ExampleMod.LOGGER.info("populateResult NONEMPTY");
-                var item = this.initContents.items.get(this.selectedIndex.get()).copyWithCount(64);
-                this.outputSlot.setStack(item);
+                var item = this.initContents.items.get(this.selectedIndex.get());
+                this.outputSlot.setStackNoCallbacks(item);
             } else {
                 ExampleMod.LOGGER.info("populateResult EMPTY");
-                this.outputSlot.setStack(ItemStack.EMPTY);
+                this.outputSlot.setStackNoCallbacks(ItemStack.EMPTY);
             }
-            this.sendContentUpdates();
         }
 
         public ScreenHandlerType<?> getType() {
