@@ -1,6 +1,5 @@
 package net.wilux.items;
 
-import com.google.common.collect.Lists;
 import com.mojang.brigadier.context.CommandContext;
 import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
 import net.minecraft.block.Block;
@@ -12,6 +11,10 @@ import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
+import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.command.ServerCommandSource;
@@ -23,12 +26,15 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.wilux.ExampleMod;
-import net.wilux.TerminalRecipeSpoofHandler;
-import net.wilux.TerminalRecipeSpoofHandler.TerminalContents;
+import net.wilux.RecipeSpoofHandler;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
+import static net.wilux.ServerCast.asServer;
 
 public class Terminal {
     public static class TerminalBlock extends Block implements PolymerTexturedBlock {
@@ -43,13 +49,38 @@ public class Terminal {
 
         @Override
         public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-            if (world.isClient) {
-                ExampleMod.LOGGER.error("WORLD IS CLIENT");
-                return ActionResult.FAIL;
-            }
+            var splayer = asServer(player, world);
 
-            TerminalScreenHandler.open((ServerPlayerEntity)player);
+            TerminalScreenHandler.open(splayer);
             return ActionResult.SUCCESS;
+        }
+    }
+
+    public static class TerminalSpoofer extends RecipeSpoofHandler.RecipeSpoof<ShapelessRecipe> {
+        public final List<ItemStack> items;
+        public TerminalSpoofer(ServerPlayerEntity splayer, int amount) {
+            super(splayer);
+            this.items = Arrays.asList(
+                    new ItemStack(Items.STONE, 99),
+                    new ItemStack(Items.COBBLESTONE, 99),
+                    new ItemStack(Items.DIORITE, 99),
+                    new ItemStack(Items.DIRT, 99),
+                    new ItemStack(Items.GLASS, 99),
+                    new ItemStack(Items.GRANITE, 99),
+                    new ItemStack(Items.SPONGE, 99),
+                    new ItemStack(Items.IRON_BLOCK, 99),
+                    new ItemStack(Items.DIAMOND, 99),
+                    new ItemStack(Items.EMERALD, 99),
+                    new ItemStack(Items.GOLD_INGOT, 99),
+                    new ItemStack(Items.IRON_INGOT, 99),
+                    new ItemStack(Items.STICK, 99)
+            );
+        }
+
+        @Override
+        public void enter() {
+            Collection<RecipeEntry<?>> recipeEntries = this.items.stream().map(RecipeSpoofHandler::mkRecipeStonecuttingBarrier).collect(Collectors.toList());
+            splayer.networkHandler.sendPacket(new SynchronizeRecipesS2CPacket(recipeEntries));
         }
     }
 
@@ -61,10 +92,9 @@ public class Terminal {
         private static final int HOTBAR_START = 29;
         private static final int HOTBAR_END = 38;
         private final ScreenHandlerContext context;
-        private final ServerPlayerEntity playerThatOpened;
+        private final TerminalSpoofer spoofer;
         private final Property selectedIndex;
         private final World world;
-        private final TerminalContents initContents;
         private ItemStack inputStack;
         long lastTakeTime;
         final Slot inputSlot;
@@ -73,15 +103,14 @@ public class Terminal {
         public final Inventory input;
         final CraftingResultInventory output;
 
-        public TerminalScreenHandler(int syncId, PlayerInventory playerInventory, ServerPlayerEntity playerThatOpened, TerminalContents contents) {
-            this(syncId, playerInventory, playerThatOpened, contents, ScreenHandlerContext.EMPTY);
+        public TerminalScreenHandler(int syncId, PlayerInventory playerInventory, TerminalSpoofer spoofer) {
+            this(syncId, playerInventory, spoofer, ScreenHandlerContext.EMPTY);
         }
 
-        public TerminalScreenHandler(int syncId, PlayerInventory playerInventory, ServerPlayerEntity playerThatOpened, TerminalContents contents, ScreenHandlerContext context) {
+        public TerminalScreenHandler(int syncId, PlayerInventory playerInventory, TerminalSpoofer spoofer, ScreenHandlerContext context) {
             super(ScreenHandlerType.STONECUTTER, syncId);
-            this.playerThatOpened = playerThatOpened;
+            this.spoofer = spoofer;
             this.selectedIndex = Property.create();
-            this.initContents = contents;
             this.inputStack = ItemStack.EMPTY;
             this.contentsChangedListener = () -> {};
             this.input = new SimpleInventory(1) {
@@ -123,7 +152,7 @@ public class Terminal {
             }
 
             this.addProperty(this.selectedIndex);
-            this.setStackInSlot(0, 0, new ItemStack(TerminalRecipeSpoofHandler.INPUT_ITEM, 3));
+            this.setStackInSlot(0, 0, new ItemStack(RecipeSpoofHandler.INPUT_ITEM, 3));
         }
 
         public boolean canUse(PlayerEntity player) {
@@ -140,7 +169,7 @@ public class Terminal {
         }
 
         private boolean isInBounds(int id) {
-            return id >= 0 && id < this.initContents.items.size();
+            return id >= 0 && id < this.spoofer.items.size();
         }
 
         public void onContentChanged(Inventory inventory) {
@@ -158,14 +187,15 @@ public class Terminal {
         }
 
         void populateResult() {
-            if (!this.initContents.items.isEmpty() && this.isInBounds(this.selectedIndex.get())) {
+            if (!this.spoofer.items.isEmpty() && this.isInBounds(this.selectedIndex.get())) {
                 ExampleMod.LOGGER.info("populateResult NONEMPTY");
-                var item = this.initContents.items.get(this.selectedIndex.get());
+                var item = this.spoofer.items.get(this.selectedIndex.get());
                 this.outputSlot.setStackNoCallbacks(item);
             } else {
                 ExampleMod.LOGGER.info("populateResult EMPTY");
                 this.outputSlot.setStackNoCallbacks(ItemStack.EMPTY);
             }
+            this.sendContentUpdates();
         }
 
         public ScreenHandlerType<?> getType() {
@@ -204,7 +234,7 @@ public class Terminal {
             this.context.run((world, pos) -> {
                 this.dropInventory(player, this.input);
             });
-            this.playerThatOpened.networkHandler.sendPacket(TerminalRecipeSpoofHandler.getRealRecipePacket());
+            this.spoofer.exit();
         }
 
         /*
@@ -227,10 +257,10 @@ public class Terminal {
         */
 
         public static void open(ServerPlayerEntity splayer) {
-            var terminalContents = new TerminalContents(1);
-            splayer.networkHandler.sendPacket(terminalContents.createPacket());
+            var spoofer = new TerminalSpoofer(splayer, 1);
+            spoofer.enter();
             var screenHandler = new SimpleNamedScreenHandlerFactory(
-                    (syncId, playerInventory, player) -> new TerminalScreenHandler(syncId, playerInventory, splayer, terminalContents),
+                    (syncId, playerInventory, player) -> new TerminalScreenHandler(syncId, playerInventory, spoofer),
                     Text.literal("Terminal")
             );
             splayer.openHandledScreen(screenHandler);
