@@ -37,7 +37,7 @@ public class ExampleMod implements ModInitializer {
 		// Proceed with mild caution.
 		LOGGER.info("Hello Fabric world!");
 
-		ServerLifecycleEvents.SERVER_STARTED.register(RecipeSpoofHandler::new);
+		ServerLifecycleEvents.SERVER_STARTED.register(RecipeSpoofHandler::new); // FIXME: should retrigger on reloads
 
 		// Register Commands
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
@@ -56,5 +56,9 @@ public class ExampleMod implements ModInitializer {
 
 	public static PolymerModelData polymerModelData(Item itemType, String assetPath) {
 		return PolymerResourcePackUtils.requestModel(itemType, new Identifier(MOD_ID, assetPath));
+	}
+
+	public static void hook() {
+		var i = 1;
 	}
 }

@@ -42,10 +42,11 @@ public class RecipeSpoofHandler {
     }
 
     public static RecipeEntry<CraftingRecipe> mkRecipeCraftOutput(ItemStack output) {
+        // TODO: care about category
         var key = output.getTranslationKey()+".monocraft";
         DefaultedList<Ingredient> inputIngredients = DefaultedList.of();
-        inputIngredients.add(Ingredient.ofItems(Items.STICK));
-        ShapelessRecipe fakeCraftRecipe = new ShapelessRecipe(key, CraftingRecipeCategory.MISC, output, inputIngredients);
+        inputIngredients.add(Ingredient.ofItems(ExampleMod.ITEM_GUI_XTERM));
+        ShapelessRecipe fakeCraftRecipe = new ShapelessRecipe(key, CraftingRecipeCategory.BUILDING, output, inputIngredients);
         return new RecipeEntry<CraftingRecipe>(new Identifier(ExampleMod.MOD_ID, key), fakeCraftRecipe);
     }
 

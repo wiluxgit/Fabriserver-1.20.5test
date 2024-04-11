@@ -113,19 +113,26 @@ public class XTerm {
             this.sendContentUpdates();
         }
 
+        public void onRecipeBookClick(Identifier recipe, boolean craftAll) {
+            ExampleMod.LOGGER.info("onRecipeBookClick {"+ "\n\trecipe="+recipe+"\n\tcraftAll="+craftAll+ "\n}");
+        }
+
+        @Override
         public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
-            if (INPUT_START <= slot.id && slot.id <= INPUT_END) {
-                return false;
-            }
-            if (slot.id == RESULT_ID) {
-                return false;
-            }
+            if (INPUT_START <= slot.id && slot.id <= INPUT_END) { return false; }
+            if (slot.id == RESULT_ID) { return false; }
             return super.canInsertIntoSlot(stack, slot);
         }
 
+        @Override
         public void onClosed(PlayerEntity player) {
             super.onClosed(player);
             this.spoofer.exit();
+        }
+
+        @Override
+        public void fillInputSlots(boolean craftAll, RecipeEntry<?> recipe, ServerPlayerEntity splayer) {
+            assert false; // This should never be called by vanilla since the selected recipe will always be invalid.
         }
 
         public static void open(ServerPlayerEntity splayer) {
