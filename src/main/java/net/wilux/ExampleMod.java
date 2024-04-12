@@ -24,15 +24,17 @@ public class ExampleMod implements ModInitializer {
 	public static final String MOD_ID = "tut";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final Item ITEM_WATERING_CAN = new WateringCan(new FabricItemSettings(), polymerModelData(Items.CLOCK, "item/silver_sword"));
-	public static final Item ITEM_GUI_XTERM = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/book_overlay"));
+	public static final Item ITEM_WATERING_CAN = new WateringCan(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/item/watering_can"));
+
+	public static final Item ITEM_GUI_XTERM_L = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_left"));
+	public static final Item ITEM_GUI_XTERM_R = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_right"));
 
 	public static final Block BLOCK_TERMINAL = new Terminal.TerminalBlock(FabricBlockSettings.create().strength(4.0f));
 	public static final Block BLOCK_XTERM = new XTerm.XTermBlock(FabricBlockSettings.create().strength(4.0f));
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
+		// This code runs as soon as Minecraft itemStack in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		LOGGER.info("Hello Fabric world!");
@@ -49,7 +51,8 @@ public class ExampleMod implements ModInitializer {
 
 		// Register Blocks/Items
 		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "watering_can"), ITEM_WATERING_CAN);
-		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm"), ITEM_GUI_XTERM);
+		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_left"), ITEM_GUI_XTERM_L);
+		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_right"), ITEM_GUI_XTERM_R);
 		Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "terminal"), BLOCK_TERMINAL);
 		Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "xterm"), BLOCK_XTERM);
 	}
