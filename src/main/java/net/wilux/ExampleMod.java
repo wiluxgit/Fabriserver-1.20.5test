@@ -28,6 +28,7 @@ public class ExampleMod implements ModInitializer {
 
 	public static final Item ITEM_GUI_XTERM_L = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_left"));
 	public static final Item ITEM_GUI_XTERM_R = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_right"));
+	public static final Item ITEM_GUI_XTERM_EMPTY = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_empty"));
 
 	public static final Block BLOCK_TERMINAL = new Terminal.TerminalBlock(FabricBlockSettings.create().strength(4.0f));
 	public static final Block BLOCK_XTERM = new XTerm.XTermBlock(FabricBlockSettings.create().strength(4.0f));
@@ -53,6 +54,7 @@ public class ExampleMod implements ModInitializer {
 		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "watering_can"), ITEM_WATERING_CAN);
 		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_left"), ITEM_GUI_XTERM_L);
 		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_right"), ITEM_GUI_XTERM_R);
+		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_empty"), ITEM_GUI_XTERM_EMPTY);
 		Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "terminal"), BLOCK_TERMINAL);
 		Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "xterm"), BLOCK_XTERM);
 	}

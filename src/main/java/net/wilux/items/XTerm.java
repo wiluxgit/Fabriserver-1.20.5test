@@ -40,11 +40,10 @@ import net.wilux.RecipeSpoofHandler;
 import net.wilux.stackstorage.StoredStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -103,6 +102,29 @@ public class XTerm {
             var unlockRecipes = new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.REMOVE, List.of(recipe), List.of(), recipeBookSettings);
             splayer.networkHandler.sendPacket(unlockRecipes);
         }
+        public void reRemember(Identifier recipe) {
+            var unlockRecipes = new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.INIT, List.of(recipe), List.of(), recipeBookSettings);
+            splayer.networkHandler.sendPacket(unlockRecipes);
+        }
+
+        public boolean insert(ItemStack itemStack) {
+            // Todo? this method could be significatly faster
+            Map.Entry<Identifier, StoredStack> matchingEntry = this.items.entrySet().stream()
+                    .filter(entry -> ItemStack.canCombine(itemStack, entry.getValue().stackCopy()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (matchingEntry == null) {
+                ExampleMod.LOGGER.warn("Tried inserting a new item, that is not supported yet");
+                return false;
+            }
+
+            StoredStack matchingStoredStack = matchingEntry.getValue();
+            Identifier matchingIdentifier = matchingEntry.getKey();
+            matchingStoredStack.insert(itemStack.getCount());
+            reRemember(matchingIdentifier);
+            return true;
+        }
 
         public @Nullable StoredStack.StackTransfer takeLargestStackIfExists(Identifier recipe) {
             var storedStack = this.items.get(recipe);
@@ -160,32 +182,66 @@ public class XTerm {
             this.spoofer = spoofer;
             this.setStackInSlot(INPUT_START, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_L, 1));
             this.setStackInSlot(INPUT_START+1, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_R, 1));
+            this.setStackInSlot(INPUT_START+2, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_EMPTY, 1));
+            this.setStackInSlot(INPUT_START+3, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_EMPTY, 1));
+            this.setStackInSlot(INPUT_START+5, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_EMPTY, 1));
+            this.setStackInSlot(INPUT_START+6, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_EMPTY, 1));
+            this.setStackInSlot(INPUT_START+7, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_EMPTY, 1));
+            this.setStackInSlot(INPUT_START+8, 0, new ItemStack(ExampleMod.ITEM_GUI_XTERM_EMPTY, 1));
             this.sendContentUpdates();
         }
 
         public void onRecipeBookClick(Identifier recipe, boolean craftAll) {
-            ExampleMod.LOGGER.info("onRecipeBookClick {"+ "\n\trecipe="+recipe+"\n\tcraftAll="+craftAll+"\n}");
+            ExampleMod.LOGGER.info("onRecipeBookClick {recipe="+recipe+", craftAll="+craftAll+"}");
 
             var stackTransfer = spoofer.takeLargestStackIfExists(recipe);
             if (stackTransfer == null) return;
-            boolean tookItem = tryGiveStackToPlayer(stackTransfer.itemStack, craftAll);
+
+            ItemStack itemStackToTransfer = stackTransfer.itemStack;
+            ItemStack visualStackCopy = itemStackToTransfer.copyWithCount(1);
+            boolean tookItem = false;
+            if (craftAll) {
+                if (this.insertItem(itemStackToTransfer, INVENTORY_START, HOTBAR_END, true)) {
+                    tookItem = true;
+                }
+            } else {
+                // Unsure how to handle non shiftclicks
+                /*var cursorStack = getCursorStack();
+                if (cursorStack.isEmpty()) {
+                    setCursorStack(itemStackToTransfer);
+                    tookItem = true;
+                }*/
+            }
             int remainingItems = stackTransfer.resolveWith(tookItem);
             ExampleMod.LOGGER.info("Transfered items out of terminal. "+remainingItems+" now remain.");
 
-            this.setStackInSlot(RESULT_ID, this.nextRevision(), stackTransfer.itemStack.copyWithCount(1)); // for visuals only
-            if (remainingItems == 0) {
-                this.spoofer.forget(recipe); // should be handled elsewhere?
-            }
-        }
-        private boolean tryGiveStackToPlayer(ItemStack itemStack, boolean shiftClick) {
-            if (shiftClick) {
-                if (!this.insertItem(itemStack, INVENTORY_START, HOTBAR_END, true)) return false;
+            if (remainingItems > 0) {
+                visualStackCopy.setCount(remainingItems);
+                this.setStackInSlot(RESULT_ID, this.nextRevision(), visualStackCopy); // for visuals only
             } else {
-                var cursorStack = getCursorStack();
-                if (!cursorStack.isEmpty()) return false;
-                setCursorStack(itemStack);
+                this.spoofer.forget(recipe); // should be handled elsewhere?
+                this.setStackInSlot(RESULT_ID, this.nextRevision(), ItemStack.EMPTY); // for visuals only
             }
-            return true;
+
+            this.sendContentUpdates();
+        }
+
+        @Override
+        public ItemStack quickMove(PlayerEntity player, int slotId) {
+            if (INPUT_START <= slotId && slotId < INPUT_END) return ItemStack.EMPTY;
+            if (slotId == RESULT_ID) return ItemStack.EMPTY;
+
+            Slot slot = this.slots.get(slotId);
+            if (!slot.hasStack()) return ItemStack.EMPTY;
+
+            ExampleMod.LOGGER.info("Relevant Quickmove with slot="+slotId);
+            ItemStack slotStack = slot.getStack();
+            var insertOk = this.spoofer.insert(slotStack);
+            if (!insertOk) return ItemStack.EMPTY;
+
+            ExampleMod.LOGGER.info("Quickmove success!"+slotId);
+            slot.setStack(ItemStack.EMPTY);
+            return ItemStack.EMPTY;
         }
 
         @Override
