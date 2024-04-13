@@ -13,11 +13,13 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.wilux.items.PolyBlockItem;
 import net.wilux.items.WateringCan;
 import net.wilux.items.XTerm;
 import net.wilux.recipespoofing.RecipeSpoofHandler;
@@ -29,7 +31,9 @@ public class PolyWorks implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static final Item ITEM_WATERING_CAN = new WateringCan(new FabricItemSettings(), polymerModelData(Items.CLOCK, "item/watering_can"));
+
 	public static final Block BLOCK_XTERM = new XTerm.XTermBlock(FabricBlockSettings.create().strength(4.0f), polymerBlockData(BlockModelType.FULL_BLOCK, "block/xterm"));
+	public static final BlockItem ITEM_XTERM = new PolyBlockItem(BLOCK_XTERM, new FabricItemSettings(), polymerModelData(Items.BARRIER, "item/xterm"));
 
 	@Override
 	public void onInitialize() {
@@ -45,16 +49,14 @@ public class PolyWorks implements ModInitializer {
 				net.minecraft.server.command.CommandManager.literal("xterm").executes(XTerm.Util::commandOpen)
 		));
 
-
 		// Register polymer asset mapping
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 
-		// Register Items
+		// Register blocks and items
 		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "watering_can"), ITEM_WATERING_CAN);
-		RegisterGuiItem.register();
-
-		// Register Blocks
+		GuiItems.registerAll();
 		Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "xterm"), BLOCK_XTERM);
+		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "xterm"), ITEM_XTERM);
 	}
 
 	public static PolymerModelData polymerModelData(Item itemType, String assetPath) {
@@ -62,11 +64,7 @@ public class PolyWorks implements ModInitializer {
 	}
 	public static BlockState polymerBlockData(BlockModelType blockModelType, String assetPath){
 		BlockState bs = PolymerBlockResourceUtils.requestBlock(blockModelType, PolymerBlockModel.of(new Identifier(MOD_ID, assetPath)));
-		assert bs != null;
+		assert bs != null; // we are a
 		return bs;
-	}
-
-	public static void hook() {
-		var i = 1;
 	}
 }
