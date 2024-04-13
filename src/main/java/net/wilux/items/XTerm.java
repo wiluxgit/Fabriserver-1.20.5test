@@ -2,12 +2,8 @@ package net.wilux.items;
 
 import com.mojang.brigadier.context.CommandContext;
 import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
-import eu.pb4.polymer.core.api.item.PolymerItem;
-import eu.pb4.polymer.core.api.item.PolymerItemUtils;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -151,7 +147,7 @@ public class XTerm {
                 var id = entry.getKey();
                 var itemStack = entry.getValue().stackCopy();
                 DefaultedList<Ingredient> inputIngredients = DefaultedList.of();
-                inputIngredients.add(Ingredient.ofItems(Items.STICK)); // Todo? have some other dummy item instead
+                inputIngredients.add(Ingredient.ofItems(RegisterGuiItem.ITEM_GUI_XTERM_EMPTY.polymerModelData.item())); // Add poly base item instead of fancy nbt
                 ShapelessRecipe fakeCraftRecipe = new ShapelessRecipe("", CraftingRecipeCategory.BUILDING, itemStack, inputIngredients);
                 return new RecipeEntry<ShapelessRecipe>(id, fakeCraftRecipe);
             }).collect(Collectors.toList());
@@ -195,14 +191,15 @@ public class XTerm {
         public XTermScreenHandler(int syncId, PlayerInventory playerInventory, XTermSpoofer spoofer) {
             super(syncId, playerInventory);
             this.spoofer = spoofer;
-            this.setStackInSlot(INPUT_DRAWOVERRIDE_L, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_L, 1));
-            this.setStackInSlot(INPUT_DRAWOVERRIDE_R, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_R, 1));
-            this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_EMPTY, 1));
-            this.setStackInSlot(INPUT_START+3, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_EMPTY, 1));
-            this.setStackInSlot(INPUT_START+5, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_EMPTY, 1));
-            this.setStackInSlot(INPUT_START+6, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_EMPTY, 1));
-            this.setStackInSlot(INPUT_START+7, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_EMPTY, 1));
-            this.setStackInSlot(INPUT_START+8, 0, new ItemStack(RegisterGuiItem.ITEM_GUI_XTERM_EMPTY, 1));
+
+            this.setStackInSlot(INPUT_DRAWOVERRIDE_L, 0, RegisterGuiItem.ITEM_GUI_XTERM_L.getStack());
+            this.setStackInSlot(INPUT_DRAWOVERRIDE_R, 0, RegisterGuiItem.ITEM_GUI_XTERM_R.getStack());
+            this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, 0, RegisterGuiItem.ITEM_GUI_XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+3, 0, RegisterGuiItem.ITEM_GUI_XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+5, 0, RegisterGuiItem.ITEM_GUI_XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+6, 0, RegisterGuiItem.ITEM_GUI_XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+7, 0, RegisterGuiItem.ITEM_GUI_XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+8, 0, RegisterGuiItem.ITEM_GUI_XTERM_EMPTY.getStack());
             this.sendContentUpdates();
         }
 
@@ -369,32 +366,6 @@ public class XTerm {
                     Text.literal("XTerm")
             );
             splayer.openHandledScreen(screenHandler);
-        }
-    }
-
-    public static class XTermItemGui extends Item implements PolymerItem {
-        final PolymerModelData cmd;
-
-        public XTermItemGui(Settings settings, PolymerModelData cmd) {
-            super(settings);
-            this.cmd = cmd;
-        }
-
-        @Override
-        public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-            return cmd.item();
-        }
-
-        @Override
-        public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipContext context, ServerPlayerEntity player) {
-            ItemStack out = PolymerItemUtils.createItemStack(itemStack, context, player);
-            //out.addEnchantment(Enchantments.LURE, 0);
-            return out;
-        }
-
-        @Override
-        public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-            return this.cmd.value();
         }
     }
 
