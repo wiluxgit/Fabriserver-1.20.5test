@@ -20,7 +20,7 @@ import java.util.List;
 
 import static net.wilux.PolyWorks.polymerModelData;
 
-public class RegisterGuiItem {
+public class GuiItems {
     public final static class GuiItem extends Item implements PolymerItem {
         public final PolymerModelData polymerModelData;
 
@@ -157,7 +157,7 @@ public class RegisterGuiItem {
     public static final List<GuiItem> COLLECTION_ITEM_GUI_XTERM_DIGIT_N0X_M = Arrays.asList(null, ITEM_GUI_XTERM_DIGIT_10XM, ITEM_GUI_XTERM_DIGIT_20XM, ITEM_GUI_XTERM_DIGIT_30XM, ITEM_GUI_XTERM_DIGIT_40XM, ITEM_GUI_XTERM_DIGIT_50XM, ITEM_GUI_XTERM_DIGIT_60XM, ITEM_GUI_XTERM_DIGIT_70XM, ITEM_GUI_XTERM_DIGIT_80XM, ITEM_GUI_XTERM_DIGIT_90XM);
     public static final List<GuiItem> COLLECTION_ITEM_GUI_XTERM_DIGIT_N00_M = Arrays.asList(null, ITEM_GUI_XTERM_DIGIT_100M, ITEM_GUI_XTERM_DIGIT_200M, ITEM_GUI_XTERM_DIGIT_300M, ITEM_GUI_XTERM_DIGIT_400M, ITEM_GUI_XTERM_DIGIT_500M, ITEM_GUI_XTERM_DIGIT_600M, ITEM_GUI_XTERM_DIGIT_700M, ITEM_GUI_XTERM_DIGIT_800M, ITEM_GUI_XTERM_DIGIT_900M);
 
-    public static void register() {
+    public static void registerAll() {
         Registry.register(Registries.ITEM, new Identifier(PolyWorks.MOD_ID, "itemgui_xterm_left"), ITEM_GUI_XTERM_L);
         Registry.register(Registries.ITEM, new Identifier(PolyWorks.MOD_ID, "itemgui_xterm_right"), ITEM_GUI_XTERM_R);
         Registry.register(Registries.ITEM, new Identifier(PolyWorks.MOD_ID, "itemgui_xterm_empty"), ITEM_GUI_XTERM_EMPTY);
