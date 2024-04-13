@@ -26,7 +26,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.wilux.ExampleMod;
-import net.wilux.RecipeSpoofHandler;
+import net.wilux.recipespoofing.RecipeSpoofHandler;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static net.wilux.ServerCast.asServer;
+import static net.wilux.util.ServerCast.asServer;
 
 public class Terminal {
     public static class TerminalBlock extends Block implements PolymerTexturedBlock {

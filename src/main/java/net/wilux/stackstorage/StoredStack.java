@@ -63,9 +63,11 @@ public class StoredStack {
         this.transferableCount -= count;
         return new StackTransfer(this, this.itemStack.copyWithCount(count));
     }
-    public void insert(int count) {
+    public int insert(int count) {
+        assert count > 0;
         this.transferableCount += count;
         this.actualCount += count;
+        return this.actualCount;
     }
 
     protected int approveTransfer(int nItemsToRemoveFromMe) {

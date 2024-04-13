@@ -1,4 +1,4 @@
-package net.wilux;
+package net.wilux.util;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;

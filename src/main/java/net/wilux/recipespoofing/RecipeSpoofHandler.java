@@ -1,16 +1,14 @@
-package net.wilux;
+package net.wilux.recipespoofing;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
 import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
+import net.wilux.ExampleMod;
 
 public class RecipeSpoofHandler {
     public static final Item INPUT_ITEM = Items.BARRIER;

@@ -17,6 +17,7 @@ import net.minecraft.util.Identifier;
 import net.wilux.items.Terminal;
 import net.wilux.items.WateringCan;
 import net.wilux.items.XTerm;
+import net.wilux.recipespoofing.RecipeSpoofHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +26,6 @@ public class ExampleMod implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static final Item ITEM_WATERING_CAN = new WateringCan(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/item/watering_can"));
-
-	public static final Item ITEM_GUI_XTERM_L = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_left"));
-	public static final Item ITEM_GUI_XTERM_R = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_right"));
-	public static final Item ITEM_GUI_XTERM_EMPTY = new XTerm.XTermItemGui(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/gui/xterm_empty"));
 
 	public static final Block BLOCK_TERMINAL = new Terminal.TerminalBlock(FabricBlockSettings.create().strength(4.0f));
 	public static final Block BLOCK_XTERM = new XTerm.XTermBlock(FabricBlockSettings.create().strength(4.0f));
@@ -50,11 +47,11 @@ public class ExampleMod implements ModInitializer {
 				net.minecraft.server.command.CommandManager.literal("xterm").executes(XTerm.Util::commandOpen)
 		));
 
-		// Register Blocks/Items
+		// Register Items
 		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "watering_can"), ITEM_WATERING_CAN);
-		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_left"), ITEM_GUI_XTERM_L);
-		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_right"), ITEM_GUI_XTERM_R);
-		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_empty"), ITEM_GUI_XTERM_EMPTY);
+		RegisterItemGui.register();
+
+		// Register Blocks
 		Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "terminal"), BLOCK_TERMINAL);
 		Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "xterm"), BLOCK_XTERM);
 	}
