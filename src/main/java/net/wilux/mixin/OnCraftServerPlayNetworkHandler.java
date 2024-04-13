@@ -4,7 +4,7 @@ package net.wilux.mixin;
 import net.minecraft.network.packet.c2s.play.CraftRequestC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.wilux.ExampleMod;
+import net.wilux.PolyWorks;
 import net.wilux.items.XTerm;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,10 +18,10 @@ public class OnCraftServerPlayNetworkHandler {
 
     @Inject(at = @At("RETURN"), method = "onCraftRequest")
     private void init(CraftRequestC2SPacket packet, CallbackInfo ci) {
-        ExampleMod.LOGGER.info("onCraftRequest");
+        PolyWorks.LOGGER.info("onCraftRequest");
         if (this.player.currentScreenHandler instanceof XTerm.XTermScreenHandler xTermScreenHandler) {
             if (xTermScreenHandler.syncId != packet.getSyncId()) {
-                ExampleMod.LOGGER.warn("Serverplayer has the wrong syncid");
+                PolyWorks.LOGGER.warn("Serverplayer has the wrong syncid");
                 return;
             }
             xTermScreenHandler.onRecipeBookClick(packet.getRecipe(), packet.shouldCraftAll());

@@ -21,8 +21,8 @@ import net.wilux.recipespoofing.RecipeSpoofHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExampleMod implements ModInitializer {
-	public static final String MOD_ID = "tut";
+public class PolyWorks implements ModInitializer {
+	public static final String MOD_ID = "polyworks";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static final Item ITEM_WATERING_CAN = new WateringCan(new FabricItemSettings(), polymerModelData(Items.CLOCK, "wx/item/watering_can"));

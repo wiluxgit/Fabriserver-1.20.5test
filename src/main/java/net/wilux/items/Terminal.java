@@ -25,7 +25,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.wilux.ExampleMod;
+import net.wilux.PolyWorks;
 import net.wilux.recipespoofing.RecipeSpoofHandler;
 
 import java.util.Arrays;
@@ -130,7 +130,7 @@ public class Terminal {
                 }
 
                 public void onTakeItem(PlayerEntity player, ItemStack stack) {
-                    ExampleMod.LOGGER.info("onTakeItem");
+                    PolyWorks.LOGGER.info("onTakeItem");
                     stack.setCount(1);
                     TerminalScreenHandler.this.populateResult();
                     super.onTakeItem(player, stack);
@@ -160,7 +160,7 @@ public class Terminal {
         }
 
         public boolean onButtonClick(PlayerEntity player, int id) {
-            ExampleMod.LOGGER.info("onButtonClick");
+            PolyWorks.LOGGER.info("onButtonClick");
             if (this.isInBounds(id)) {
                 this.selectedIndex.set(id);
                 this.populateResult();
@@ -173,7 +173,7 @@ public class Terminal {
         }
 
         public void onContentChanged(Inventory inventory) {
-            ExampleMod.LOGGER.info("onContentChanged");
+            PolyWorks.LOGGER.info("onContentChanged");
 
             ItemStack itemStack = this.inputSlot.getStack();
             if (!itemStack.isOf(this.inputStack.getItem())) {
@@ -183,16 +183,16 @@ public class Terminal {
         }
 
         private void updateInput(Inventory input, ItemStack stack) {
-            ExampleMod.LOGGER.info("updateInput");
+            PolyWorks.LOGGER.info("updateInput");
         }
 
         void populateResult() {
             if (!this.spoofer.items.isEmpty() && this.isInBounds(this.selectedIndex.get())) {
-                ExampleMod.LOGGER.info("populateResult NONEMPTY");
+                PolyWorks.LOGGER.info("populateResult NONEMPTY");
                 var item = this.spoofer.items.get(this.selectedIndex.get());
                 this.outputSlot.setStackNoCallbacks(item);
             } else {
-                ExampleMod.LOGGER.info("populateResult EMPTY");
+                PolyWorks.LOGGER.info("populateResult EMPTY");
                 this.outputSlot.setStackNoCallbacks(ItemStack.EMPTY);
             }
             this.sendContentUpdates();
@@ -213,7 +213,7 @@ public class Terminal {
         public ItemStack quickMove(PlayerEntity player, int slotId) {
             Random rand = new Random();
             int r = rand.nextInt(49)+2;
-            ExampleMod.LOGGER.info("Shiftclick Terminal ITEM"+r);
+            PolyWorks.LOGGER.info("Shiftclick Terminal ITEM"+r);
 
             Slot slot = this.slots.get(slotId);
             ItemStack itemStack = slot.getStack();
@@ -228,7 +228,7 @@ public class Terminal {
         }
 
         public void onClosed(PlayerEntity player) {
-            ExampleMod.LOGGER.info("onClosed");
+            PolyWorks.LOGGER.info("onClosed");
             super.onClosed(player);
             this.output.removeStack(1);
             this.context.run((world, pos) -> {

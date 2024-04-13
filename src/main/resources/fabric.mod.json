@@ -1,31 +1,31 @@
 {
 	"schemaVersion": 1,
-	"id": "tut",
+	"id": "polyworks",
 	"version": "${version}",
-	"name": "Example mod",
+	"name": "PolyWorks",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
 		"Me!"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://wilux.net/",
+		"sources": "https://github.com/wiluxgit/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/modid/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "net.wilux.ExampleMod"
+			"net.wilux.PolyWorks"
 		],
 		"client": [
 			"net.wilux.ExampleModClient"
 		]
 	},
 	"mixins": [
-		"modid.mixins.json",
+		"polyworks.mixins.json",
 		{
-			"config": "modid.client.mixins.json",
+			"config": "polyworks.client.mixins.json",
 			"environment": "client"
 		}
 	],

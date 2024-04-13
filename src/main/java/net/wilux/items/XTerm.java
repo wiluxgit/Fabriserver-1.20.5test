@@ -36,12 +36,11 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.wilux.ExampleMod;
+import net.wilux.PolyWorks;
 import net.wilux.RegisterItemGui;
 import net.wilux.recipespoofing.RecipeSpoofHandler;
 import net.wilux.stackstorage.StoredStack;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Mutable;
 
 import java.util.Collection;
 import java.util.List;
@@ -96,7 +95,7 @@ public class XTerm {
             ).map(x -> new Pair<ItemStack, Integer>(new ItemStack(x.getLeft()), x.getRight())).toList();
 
             this.items = tempItems.stream().collect(Collectors.toMap(
-                x -> new Identifier(ExampleMod.MOD_ID, "xterm."+x.getLeft().getItem().getTranslationKey()),
+                x -> new Identifier(PolyWorks.MOD_ID, "xterm."+x.getLeft().getItem().getTranslationKey()),
                 x -> new StoredStack(x.getLeft(), x.getRight())
             ));
         }
@@ -119,7 +118,7 @@ public class XTerm {
                     .orElse(null);
 
             if (matchingEntry == null) {
-                ExampleMod.LOGGER.warn("Tried inserting a new item, that is not supported yet");
+                PolyWorks.LOGGER.warn("Tried inserting a new item, that is not supported yet");
                 return new InsertResult(false, -1);
             }
 
@@ -133,7 +132,7 @@ public class XTerm {
         public @Nullable StoredStack.StackTransfer takeLargestStackIfExists(Identifier recipe) {
             var storedStack = this.items.get(recipe);
             if (storedStack == null) {
-                ExampleMod.LOGGER.warn("Player tried to take item that is not contained");
+                PolyWorks.LOGGER.warn("Player tried to take item that is not contained");
                 return null;
             }
             return storedStack.takeLargest();
@@ -201,7 +200,7 @@ public class XTerm {
         }
 
         public void onRecipeBookClick(Identifier recipe, boolean craftAll) {
-            ExampleMod.LOGGER.info("onRecipeBookClick {recipe="+recipe+", craftAll="+craftAll+"}");
+            PolyWorks.LOGGER.info("onRecipeBookClick {recipe="+recipe+", craftAll="+craftAll+"}");
 
             var stackTransfer = spoofer.takeLargestStackIfExists(recipe);
             if (stackTransfer == null) return;
@@ -222,7 +221,7 @@ public class XTerm {
                 }*/
             }
             int remainingItems = stackTransfer.resolveWith(tookItem);
-            ExampleMod.LOGGER.info("Transfered items out of terminal. "+remainingItems+" now remain.");
+            PolyWorks.LOGGER.info("Transfered items out of terminal. "+remainingItems+" now remain.");
 
             if (remainingItems > 0) {
                 this.setOutput(visualStackCopy, remainingItems);
@@ -327,12 +326,12 @@ public class XTerm {
             Slot slot = this.slots.get(slotId);
             if (!slot.hasStack()) return ItemStack.EMPTY;
 
-            ExampleMod.LOGGER.info("Relevant Quickmove with slot="+slotId);
+            PolyWorks.LOGGER.info("Relevant Quickmove with slot="+slotId);
             ItemStack slotStack = slot.getStack();
             var insertOk = this.insert(slotStack);
             if (!insertOk) return ItemStack.EMPTY;
 
-            ExampleMod.LOGGER.info("Quickmove success!"+slotId);
+            PolyWorks.LOGGER.info("Quickmove success!"+slotId);
             slot.setStack(ItemStack.EMPTY);
             return ItemStack.EMPTY;
         }
