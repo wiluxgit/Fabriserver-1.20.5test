@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "polyworks:block/xterm_front",
+    "side": "polyworks:block/xterm_side",
+    "top": "polyworks:block/xterm_top"
+  }
+}

@@ -1,0 +1,6 @@
+{
+	"parent": "polyworks:guiitem/digit/_base",
+	"textures": {
+		"layer0": "polyworks:guiitem/digit/digit_300s"
+	}
+}

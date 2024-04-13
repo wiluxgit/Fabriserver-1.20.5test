@@ -1,0 +1,26 @@
+{
+	"textures": {
+		"layer0": "polyworks:guiitem/xterm_left"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [0, 0, 0],
+			"rotation": {"angle": 0, "axis": "z", "origin": [-10, 68, 0], "rescale": true},
+			"faces": {
+				"south": {"uv": [0, 0, 0, 0], "texture": "#layer0"}
+			}
+		}
+	],
+	"gui_light": "front",
+	"display": {
+		"ground": {
+			"translation": [0, 2, 0],
+			"scale": [1, 1, 0.5]
+		},
+		"gui": {
+			"translation": [-80, 0, 0],
+			"scale": [4, 4, 1]
+		}
+	}
+}

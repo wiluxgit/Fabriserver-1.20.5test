@@ -1,0 +1,10 @@
+{
+	"parent": "item/generated",
+	"gui_light": "front",
+	"display": {
+		"gui": {
+			"scale": [2, 2, 1],
+			"translation": [65, -35, 10]
+		}
+	}
+}
