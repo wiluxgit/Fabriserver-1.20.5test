@@ -1,0 +1,9 @@
+{
+    "parent": "minecraft:block/orientable_with_bottom",
+    "textures": {
+      "bottom": "polyworks:block/machine/machine_generic_bottom",
+      "front": "polyworks:block/machine/plater",
+      "side": "polyworks:block/machine/machine_generic_side",
+      "top": "polyworks:block/machine/machine_generic_top"
+    }
+  }

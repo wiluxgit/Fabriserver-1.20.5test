@@ -1,4 +1,4 @@
-package net.wilux.items;
+package net.wilux.objects.xterm;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.serialization.MapCodec;
@@ -38,6 +38,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.wilux.PolyWorks;
 import net.wilux.GuiItems;
+import net.wilux.objects.base.PolyHorizontalFacingBlock;
 import net.wilux.recipespoofing.RecipeSpoofHandler;
 import net.wilux.stackstorage.StoredStack;
 import org.jetbrains.annotations.Nullable;
@@ -53,48 +54,9 @@ import static java.lang.Math.max;
 import static net.wilux.util.ServerCast.asServer;
 
 public class XTerm {
-    public static class XTermBlock extends HorizontalFacingBlock implements PolymerTexturedBlock {
-
-        // HorizontalFacingBlock methods
-        public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-        private static final MapCodec<XTermBlock> CODEC = createCodec(XTermBlock::new);
-
-        protected XTermBlock(Settings settings) {
-            super(settings);
-            setDefaultState(getDefaultState().with(FACING, Direction.NORTH));
-        }
-        @Override protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-            builder.add(FACING);
-        }
-        @Override protected MapCodec<XTermBlock> getCodec() {
-            return CODEC;
-        }
-        @Override public BlockState getPlacementState(ItemPlacementContext ctx) {
-            var facing = ctx.getHorizontalPlayerFacing().getOpposite();
-            return this.getDefaultState().with(FACING, facing);
-        }
-
-        // Polymer methods
-        private static final Map<Direction, BlockState> dirPolymerState = new HashMap<>();
-
-        public XTermBlock(Settings settings, BlockState northPolymerState) {
-            this(settings);
-            withDirectionalPolymer(northPolymerState, Direction.NORTH);
-        }
-        public XTermBlock withDirectionalPolymer(BlockState polymerState, Direction direction) {
-            // TODO: make as interface?
-            if (dirPolymerState.putIfAbsent(direction, polymerState) != null) {
-                throw new RuntimeException(XTermBlock.class + " already has a blockstate for direction:" + direction);
-            }
-            return this;
-        }
-        @Override
-        public Block getPolymerBlock(BlockState state) {
-            return dirPolymerState.get(Direction.NORTH).getBlock();
-        }
-        @Override
-        public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-            return dirPolymerState.get(state.get(FACING));
+    public static class XTermBlock extends PolyHorizontalFacingBlock {
+        public XTermBlock(Settings settings, BlockState northPolymerState, BlockState eastPolymerState, BlockState southPolymerState, BlockState westPolymerState) {
+            super(settings, northPolymerState, eastPolymerState, southPolymerState, westPolymerState);
         }
 
         // Other methods

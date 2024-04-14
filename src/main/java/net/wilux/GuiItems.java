@@ -13,49 +13,17 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.wilux.PolyWorks;
+import net.wilux.objects.base.GuiItem;
 import org.jetbrains.annotations.Nullable;
 ;
 import java.util.Arrays;
 import java.util.List;
 
-import static net.wilux.PolyWorks.polymerModelData;
+import static net.wilux.PolyWorks.RegisterHelper.polymerModelData;
 
 public class GuiItems {
-    public final static class GuiItem extends Item implements PolymerItem {
-        public final PolymerModelData polymerModelData;
 
-        public GuiItem(Settings settings, PolymerModelData polymerModelData) {
-            super(settings);
-            this.polymerModelData = polymerModelData;
-        }
-
-        public ItemStack getStack() {
-            return new ItemStack(this);
-        }
-        public ItemStack getDataOnlyStack() {
-            Item clientsideItem = this.polymerModelData.item();
-            ItemStack stack = new ItemStack(clientsideItem);
-            NbtCompound tag = stack.getOrCreateNbt();
-            tag.putInt("CustomModelData", this.polymerModelData.value());
-            stack.setNbt(tag);
-            return stack;
-        }
-
-        @Override
-        public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-            return polymerModelData.item();
-        }
-
-        @Override
-        public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipContext context, ServerPlayerEntity player) {
-            return PolymerItemUtils.createItemStack(itemStack, context, player);
-        }
-
-        @Override
-        public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-            return this.polymerModelData.value();
-        }
-    }
 
     public static final GuiItem ITEM_GUI_XTERM_L = new GuiItem(new FabricItemSettings(), polymerModelData(Items.CLOCK, "guiitem/xterm_left"));
     public static final GuiItem ITEM_GUI_XTERM_R = new GuiItem(new FabricItemSettings(), polymerModelData(Items.CLOCK, "guiitem/xterm_right"));

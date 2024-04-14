@@ -1,0 +1,9 @@
+{
+    "parent": "minecraft:block/orientable_with_bottom",
+    "textures": {
+      "bottom": "polyworks:block/machine/machine_bottomed_bottom",
+      "front": "polyworks:block/machine/coal_generator",
+      "side": "polyworks:block/machine/machine_bottomed_side",
+      "top": "polyworks:block/machine/machine_bottomed_top"
+    }
+  }
