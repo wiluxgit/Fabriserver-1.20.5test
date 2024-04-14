@@ -94,7 +94,7 @@ public class XTerm {
         }
         @Override
         public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-            return dirPolymerState.get(player.getHorizontalFacing().getOpposite());
+            return dirPolymerState.get(state.get(FACING));
         }
 
         // Other methods
