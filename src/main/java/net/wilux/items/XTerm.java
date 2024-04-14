@@ -1,12 +1,13 @@
 package net.wilux.items;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.serialization.MapCodec;
 import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
@@ -22,6 +23,9 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -30,6 +34,7 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.wilux.PolyWorks;
 import net.wilux.GuiItems;
@@ -38,40 +43,67 @@ import net.wilux.stackstorage.StoredStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static net.wilux.util.ServerCast.asServer;
 
 public class XTerm {
-    public static class XTermBlock extends Block implements PolymerTexturedBlock {
-        private final BlockState polymerState;
+    public static class XTermBlock extends HorizontalFacingBlock implements PolymerTexturedBlock {
 
-        public XTermBlock(Settings settings, BlockState polymerState) {
+        // HorizontalFacingBlock methods
+        public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+        private static final MapCodec<XTermBlock> CODEC = createCodec(XTermBlock::new);
+
+        protected XTermBlock(Settings settings) {
             super(settings);
-            this.polymerState = polymerState;
+            setDefaultState(getDefaultState().with(FACING, Direction.NORTH));
+        }
+        @Override protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+            builder.add(FACING);
+        }
+        @Override protected MapCodec<XTermBlock> getCodec() {
+            return CODEC;
+        }
+        @Override public BlockState getPlacementState(ItemPlacementContext ctx) {
+            var facing = ctx.getHorizontalPlayerFacing().getOpposite();
+            return this.getDefaultState().with(FACING, facing);
         }
 
+        // Polymer methods
+        private static final Map<Direction, BlockState> dirPolymerState = new HashMap<>();
+
+        public XTermBlock(Settings settings, BlockState northPolymerState) {
+            this(settings);
+            withDirectionalPolymer(northPolymerState, Direction.NORTH);
+        }
+        public XTermBlock withDirectionalPolymer(BlockState polymerState, Direction direction) {
+            // TODO: make as interface?
+            if (dirPolymerState.putIfAbsent(direction, polymerState) != null) {
+                throw new RuntimeException(XTermBlock.class + " already has a blockstate for direction:" + direction);
+            }
+            return this;
+        }
+        @Override
+        public Block getPolymerBlock(BlockState state) {
+            return dirPolymerState.get(Direction.NORTH).getBlock();
+        }
+        @Override
+        public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
+            return dirPolymerState.get(player.getHorizontalFacing().getOpposite());
+        }
+
+        // Other methods
         @Override
         public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
             var splayer = asServer(player, world);
             XTermScreenHandler.open(splayer);
 
             return ActionResult.SUCCESS;
-        }
-
-        @Override
-        public Block getPolymerBlock(BlockState state) {
-            return this.polymerState.getBlock();
-        }
-
-        @Override
-        public BlockState getPolymerBlockState(BlockState state) {
-            return this.polymerState;
         }
     }
 
