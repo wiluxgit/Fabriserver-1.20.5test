@@ -1,15 +1,12 @@
 package net.wilux.objects;
 
-import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -20,23 +17,20 @@ import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
 import net.wilux.register.Registered;
 import net.wilux.stackstorage.StoredStack;
 import net.wilux.util.ExtraExceptions;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import static net.wilux.util.ServerCast.asServer;
 
 public final class Crate {
     public static class CrateBlockEntity extends BlockEntity {
-        public final int MAX_SIZE = 512; //Todo, limit in other ways
+        public final int MAX_ITEM_COUNT = 512; //Todo, limit in other ways
 
-        private @NotNull StoredStack ss;
+        private @Nullable StoredStack ss = null;
 
         public CrateBlockEntity(BlockPos pos, BlockState state) {
             super(Registered.CRATE.BLOCK_ENTITY_TYPE, pos, state);
-            ss = new StoredStack(ItemStack.EMPTY, 0, MAX_SIZE);
         }
 
         public static void tick(World world, BlockPos pos, BlockState state, CrateBlockEntity be) {
@@ -44,8 +38,19 @@ public final class Crate {
         }
 
         public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-            PolyWorks.LOGGER.info("Clicked on box!"+hit.getType());
+            PolyWorks.LOGGER.info("Clicked on box with:"+ss+" hit.getType()="+hit.getType());
             ItemStack handStack = player.getStackInHand(hand);
+
+            if (ss == null) {
+                ss = new StoredStack(handStack, 0, MAX_ITEM_COUNT);
+                StoredStack.InTransfer transfer = ss.insert(handStack);
+                if (transfer == null) {
+                    throw new ExtraExceptions.ProbablyImpossibleException("Could not insert into brand new stack");
+                }
+                transfer.resolveWith(true, handStack);
+                return ActionResult.SUCCESS;
+            }
+
             return ActionResult.PASS;
         }
 

@@ -4,8 +4,6 @@ import net.minecraft.item.ItemStack;
 import net.wilux.PolyWorks;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.logging.Logger;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -25,44 +23,53 @@ public class StoredStack {
         this.maxCount = maxCount;
     }
 
+    @Override
+    public String toString() {
+        return StoredStack.class.getSimpleName()+"{item=\""+itemStack.getName()+"\", count="+this.actualCount+"}";
+    }
+
     public ItemStack stackCopy() {
         return this.itemStack.copy();
     }
-    public int amount() {
+    public int count() {
         return actualCount;
     }
 
-    private void modifyActualCount(int delta) {
-        this.actualCount += delta;
-        assert this.actualCount <= this.maxCount;
-        assert this.actualCount >= 0;
-    }
-    private void changed(String why) {
-        PolyWorks.LOGGER.info("modified stored stack because: \""+why+"\" is now: ["+
-                "actual=" + this.actualCount + ", " +
-                "inAble=" + this.inAbleCount + ", " +
-                "outAble=" + this.outAbleCount + "]"
-        );
-    }
-
-    public @Nullable StackOutTransfer takeLargest() {
+    /**
+     *
+     * @return null if no items can be taken, otherwise OutTransfer
+     */
+    public @Nullable StoredStack.OutTransfer takeLargestStack() {
         var getSize = min(this.outAbleCount, this.itemStack.getMaxCount());
         this.changed("takeLargest");
-        return this.take(getSize);
+        return this.takeExact(getSize);
     }
-    public @Nullable StackOutTransfer take(int count) {
+
+    /**
+     *
+     * @param count how many items to take
+     * @return null if that many items can not be taken, otherwise OutTransfer
+     */
+    public @Nullable StoredStack.OutTransfer takeExact(int count) {
         if (count > this.outAbleCount) return null;
         this.outAbleCount -= count;
-        this.changed("take");
-        return new StackOutTransfer(this, this.itemStack.copyWithCount(count));
+        this.changed("takeExact");
+        return new OutTransfer(this, this.itemStack.copyWithCount(count));
     }
-    public @Nullable StackInTransfer insert(ItemStack inStack) {
+
+    /**
+     *
+     * @param inStack if item matches increase the count with this much
+     * @return Null if the item can not be combined, otherwise InTransfer
+     */
+    public @Nullable StoredStack.InTransfer insert(ItemStack inStack) {
         if (!ItemStack.canCombine(inStack, this.itemStack)) return null;
-        int nToInsert = inStack.getCount();
-        var delta = min(nToInsert, this.inAbleCount);
-        this.inAbleCount -= delta;
+        int nItemsInStack = inStack.getCount();
+        var nItemsToInsert = min(nItemsInStack, this.inAbleCount);
+        var nItemsRemainingThatShouldRemainInStack = nItemsInStack-nItemsToInsert;
+        this.inAbleCount -= nItemsToInsert;
         this.changed("insert");
-        return new StackInTransfer(this, this.itemStack.copyWithCount(delta), delta);
+        return new InTransfer(this, this.itemStack.copyWithCount(nItemsToInsert), nItemsRemainingThatShouldRemainInStack);
     }
 
     protected int approveOutTransfer(int nItemsToRemoveFromMe) {
@@ -90,7 +97,20 @@ public class StoredStack {
         return this.actualCount;
     }
 
-    public static class StackInTransfer {
+    private void modifyActualCount(int delta) {
+        this.actualCount += delta;
+        assert this.actualCount <= this.maxCount;
+        assert this.actualCount >= 0;
+    }
+    private void changed(String why) {
+        PolyWorks.LOGGER.info("modified stored stack because: \""+why+"\". Is now: ["+
+                "actual=" + this.actualCount + ", " +
+                "inAble=" + this.inAbleCount + ", " +
+                "outAble=" + this.outAbleCount + "]"
+        );
+    }
+
+    public static class InTransfer {
         private final StoredStack backref;
         private boolean resolved;
         private final int nItemsToInsert;
@@ -98,7 +118,7 @@ public class StoredStack {
 
         public final ItemStack itemStackToBeInserted;
 
-        protected StackInTransfer(StoredStack backref, ItemStack itemStack, int nItemsThatWillRemainInInput) {
+        protected InTransfer(StoredStack backref, ItemStack itemStack, int nItemsThatWillRemainInInput) {
             this.resolved = false;
             this.backref = backref;
             this.nItemsThatWillRemainInInput = nItemsThatWillRemainInInput;
@@ -109,8 +129,8 @@ public class StoredStack {
         /**
          *
          * @param approved weather to approve or reject the transfer
-         * @param stackToTakeItemsFrom /!\ MUST BE THE SAME STACK THAT WAS INSERTED /!\
-         * @return
+         * @param stackToTakeItemsFrom Items to take fraom /!\ MUST BE THE SAME STACK THAT WAS INSERTED /!\ TODO? verify no misuse is possible
+         * @return the number of items remaining in the container after this transfer has resolved
          */
         public int resolveWith(boolean approved, ItemStack stackToTakeItemsFrom) {
             if (this.resolved) throw new RuntimeException("Transfer has already resolved! how?");
@@ -118,6 +138,7 @@ public class StoredStack {
             if (approved) {
                 remainingItems = this.backref.approveInTransfer(nItemsToInsert);
                 stackToTakeItemsFrom.setCount(this.nItemsThatWillRemainInInput);
+                PolyWorks.LOGGER.info("Settings input stack to "+this.nItemsThatWillRemainInInput);
             } else {
                 remainingItems = this.backref.rejectInTransfer(nItemsToInsert);
             }
@@ -127,14 +148,14 @@ public class StoredStack {
         }
     }
 
-    public static class StackOutTransfer {
+    public static class OutTransfer {
         private final StoredStack backref;
         private boolean resolved;
         private final int nItemsToTake;
 
         public final ItemStack itemStackToExtract;
 
-        protected StackOutTransfer(StoredStack backref, ItemStack itemStack) {
+        protected OutTransfer(StoredStack backref, ItemStack itemStack) {
             this.resolved = false;
             this.backref = backref;
             this.nItemsToTake = itemStack.getCount();

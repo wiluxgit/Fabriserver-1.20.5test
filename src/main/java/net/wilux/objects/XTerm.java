@@ -101,7 +101,7 @@ public class XTerm {
             splayer.networkHandler.sendPacket(unlockRecipes);
         }
 
-        public @Nullable StoredStack.StackInTransfer insertAsManyAsPossible(ItemStack itemStack) {
+        public @Nullable StoredStack.InTransfer insertAsManyAsPossible(ItemStack itemStack) {
             // Todo? this method could be significatly faster
             Map.Entry<Identifier, StoredStack> matchingEntry = this.items.entrySet().stream()
                     .filter(entry -> ItemStack.canCombine(itemStack, entry.getValue().stackCopy()))
@@ -115,7 +115,7 @@ public class XTerm {
 
             StoredStack matchingStoredStack = matchingEntry.getValue();
             Identifier matchingIdentifier = matchingEntry.getKey();
-            StoredStack.StackInTransfer transfer = matchingStoredStack.insert(itemStack);
+            StoredStack.InTransfer transfer = matchingStoredStack.insert(itemStack);
             if (transfer == null) {
                 return null;
             }
@@ -124,13 +124,13 @@ public class XTerm {
             return transfer;
         }
 
-        public @Nullable StoredStack.StackOutTransfer takeLargestStackIfExists(Identifier recipe) {
+        public @Nullable StoredStack.OutTransfer takeLargestStackIfExists(Identifier recipe) {
             var storedStack = this.items.get(recipe);
             if (storedStack == null) {
                 PolyWorks.LOGGER.warn("Player tried to take item that is not contained");
                 return null;
             }
-            return storedStack.takeLargest();
+            return storedStack.takeLargestStack();
         }
 
         private Collection<RecipeEntry<?>> getSpoofRecipeList() {
