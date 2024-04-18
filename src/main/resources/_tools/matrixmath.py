@@ -26,17 +26,18 @@ rotx = np.asarray([
     [0, 0,        0,       1],
 ])
 scale = np.asarray([
-    [1, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0],
+    [0.4, 0, 0, 0],
+    [0, 0.4, 0, 0.1],
+    [0, 0, 0.01, 0.48],
     [0, 0, 0, 1],
 ])
 
-A = scale @ rotx @ roty
+A = (scale @ rotx @ roty)
 
 nbt = """{
     transformation:"""+fmt(A)+""",
-    item:{id:"minecraft:furnace",Count:1b}}"""
+    brightness:{sky:15,block:15},
+    item:{id:"minecraft:sponge",Count:1b}}"""
 nbt = nbt.replace(" ", "").replace("\n", "")
 
 cmd = "/summon item_display ~ ~1 ~ " + nbt

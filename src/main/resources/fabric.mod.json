@@ -12,7 +12,7 @@
 		"sources": "https://github.com/wiluxgit/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
+	"icon": "assets/polyworks/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -36,7 +36,8 @@
 		"fabric-api": "*",
 		"polymer-core": ">=0.7.7",
 		"polymer-resource-pack": ">=0.7.7",
-		"polymer-blocks": ">=0.7.7"
+		"polymer-blocks": ">=0.7.7",
+		"polymer-virtual-entity": ">=0.7.7"
 	},
 	"suggests": {
 		"another-mod": "*"

@@ -1,13 +1,10 @@
 package net.wilux.objects.xterm;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.serialization.MapCodec;
-import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
@@ -23,9 +20,6 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -34,17 +28,17 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.wilux.PolyWorks;
-import net.wilux.GuiItems;
-import net.wilux.objects.base.PolyHorizontalFacingBlock;
+import net.wilux.objects.base.GuiItem;
+import net.wilux.objects.base.horizontal.PolyHorizontalFacingBlock;
 import net.wilux.recipespoofing.RecipeSpoofHandler;
+import net.wilux.register.Registered;
 import net.wilux.stackstorage.StoredStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,7 +53,6 @@ public class XTerm {
             super(settings, northPolymerState, eastPolymerState, southPolymerState, westPolymerState);
         }
 
-        // Other methods
         @Override
         public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
             var splayer = asServer(player, world);
@@ -141,7 +134,7 @@ public class XTerm {
                 var id = entry.getKey();
                 var itemStack = entry.getValue().stackCopy();
                 DefaultedList<Ingredient> inputIngredients = DefaultedList.of();
-                inputIngredients.add(Ingredient.ofItems(GuiItems.ITEM_GUI_XTERM_EMPTY.polymerModelData.item())); // Add poly base item instead of fancy nbt
+                inputIngredients.add(Ingredient.ofItems(Registered.GUI_ITEMS.XTERM_EMPTY.polymerModelData.item())); // Add poly base item instead of fancy nbt
                 ShapelessRecipe fakeCraftRecipe = new ShapelessRecipe("", CraftingRecipeCategory.BUILDING, itemStack, inputIngredients);
                 return new RecipeEntry<ShapelessRecipe>(id, fakeCraftRecipe);
             }).collect(Collectors.toList());
@@ -167,6 +160,18 @@ public class XTerm {
     }
 
     public static class XTermScreenHandler extends CraftingScreenHandler {
+        protected static class XTermDigits {
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_NXX_S = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_1XXS, Registered.GUI_ITEMS.XTERM_DIGIT_2XXS, Registered.GUI_ITEMS.XTERM_DIGIT_3XXS, Registered.GUI_ITEMS.XTERM_DIGIT_4XXS, Registered.GUI_ITEMS.XTERM_DIGIT_5XXS, Registered.GUI_ITEMS.XTERM_DIGIT_6XXS, Registered.GUI_ITEMS.XTERM_DIGIT_7XXS, Registered.GUI_ITEMS.XTERM_DIGIT_8XXS, Registered.GUI_ITEMS.XTERM_DIGIT_9XXS);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N0X_S = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_10XS, Registered.GUI_ITEMS.XTERM_DIGIT_20XS, Registered.GUI_ITEMS.XTERM_DIGIT_30XS, Registered.GUI_ITEMS.XTERM_DIGIT_40XS, Registered.GUI_ITEMS.XTERM_DIGIT_50XS, Registered.GUI_ITEMS.XTERM_DIGIT_60XS, Registered.GUI_ITEMS.XTERM_DIGIT_70XS, Registered.GUI_ITEMS.XTERM_DIGIT_80XS, Registered.GUI_ITEMS.XTERM_DIGIT_90XS);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N00_S = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_100S, Registered.GUI_ITEMS.XTERM_DIGIT_200S, Registered.GUI_ITEMS.XTERM_DIGIT_300S, Registered.GUI_ITEMS.XTERM_DIGIT_400S, Registered.GUI_ITEMS.XTERM_DIGIT_500S, Registered.GUI_ITEMS.XTERM_DIGIT_600S, Registered.GUI_ITEMS.XTERM_DIGIT_700S, Registered.GUI_ITEMS.XTERM_DIGIT_800S, Registered.GUI_ITEMS.XTERM_DIGIT_900S);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_NXX_K = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_1XXK, Registered.GUI_ITEMS.XTERM_DIGIT_2XXK, Registered.GUI_ITEMS.XTERM_DIGIT_3XXK, Registered.GUI_ITEMS.XTERM_DIGIT_4XXK, Registered.GUI_ITEMS.XTERM_DIGIT_5XXK, Registered.GUI_ITEMS.XTERM_DIGIT_6XXK, Registered.GUI_ITEMS.XTERM_DIGIT_7XXK, Registered.GUI_ITEMS.XTERM_DIGIT_8XXK, Registered.GUI_ITEMS.XTERM_DIGIT_9XXK);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N0X_K = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_10XK, Registered.GUI_ITEMS.XTERM_DIGIT_20XK, Registered.GUI_ITEMS.XTERM_DIGIT_30XK, Registered.GUI_ITEMS.XTERM_DIGIT_40XK, Registered.GUI_ITEMS.XTERM_DIGIT_50XK, Registered.GUI_ITEMS.XTERM_DIGIT_60XK, Registered.GUI_ITEMS.XTERM_DIGIT_70XK, Registered.GUI_ITEMS.XTERM_DIGIT_80XK, Registered.GUI_ITEMS.XTERM_DIGIT_90XK);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N00_K = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_100K, Registered.GUI_ITEMS.XTERM_DIGIT_200K, Registered.GUI_ITEMS.XTERM_DIGIT_300K, Registered.GUI_ITEMS.XTERM_DIGIT_400K, Registered.GUI_ITEMS.XTERM_DIGIT_500K, Registered.GUI_ITEMS.XTERM_DIGIT_600K, Registered.GUI_ITEMS.XTERM_DIGIT_700K, Registered.GUI_ITEMS.XTERM_DIGIT_800K, Registered.GUI_ITEMS.XTERM_DIGIT_900K);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_NXX_M = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_1XXM, Registered.GUI_ITEMS.XTERM_DIGIT_2XXM, Registered.GUI_ITEMS.XTERM_DIGIT_3XXM, Registered.GUI_ITEMS.XTERM_DIGIT_4XXM, Registered.GUI_ITEMS.XTERM_DIGIT_5XXM, Registered.GUI_ITEMS.XTERM_DIGIT_6XXM, Registered.GUI_ITEMS.XTERM_DIGIT_7XXM, Registered.GUI_ITEMS.XTERM_DIGIT_8XXM, Registered.GUI_ITEMS.XTERM_DIGIT_9XXM);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N0X_M = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_10XM, Registered.GUI_ITEMS.XTERM_DIGIT_20XM, Registered.GUI_ITEMS.XTERM_DIGIT_30XM, Registered.GUI_ITEMS.XTERM_DIGIT_40XM, Registered.GUI_ITEMS.XTERM_DIGIT_50XM, Registered.GUI_ITEMS.XTERM_DIGIT_60XM, Registered.GUI_ITEMS.XTERM_DIGIT_70XM, Registered.GUI_ITEMS.XTERM_DIGIT_80XM, Registered.GUI_ITEMS.XTERM_DIGIT_90XM);
+            public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N00_M = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_100M, Registered.GUI_ITEMS.XTERM_DIGIT_200M, Registered.GUI_ITEMS.XTERM_DIGIT_300M, Registered.GUI_ITEMS.XTERM_DIGIT_400M, Registered.GUI_ITEMS.XTERM_DIGIT_500M, Registered.GUI_ITEMS.XTERM_DIGIT_600M, Registered.GUI_ITEMS.XTERM_DIGIT_700M, Registered.GUI_ITEMS.XTERM_DIGIT_800M, Registered.GUI_ITEMS.XTERM_DIGIT_900M);
+        }
+
         public static final int RESULT_ID = 0;
         private static final int INPUT_START = 1;
         private static final int INPUT_END = 10;
@@ -186,14 +191,14 @@ public class XTerm {
             super(syncId, playerInventory);
             this.spoofer = spoofer;
 
-            this.setStackInSlot(INPUT_DRAWOVERRIDE_L, 0, GuiItems.ITEM_GUI_XTERM_L.getStack());
-            this.setStackInSlot(INPUT_DRAWOVERRIDE_R, 0, GuiItems.ITEM_GUI_XTERM_R.getStack());
-            this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, 0, GuiItems.ITEM_GUI_XTERM_EMPTY.getStack());
-            this.setStackInSlot(INPUT_START+3, 0, GuiItems.ITEM_GUI_XTERM_EMPTY.getStack());
-            this.setStackInSlot(INPUT_START+5, 0, GuiItems.ITEM_GUI_XTERM_EMPTY.getStack());
-            this.setStackInSlot(INPUT_START+6, 0, GuiItems.ITEM_GUI_XTERM_EMPTY.getStack());
-            this.setStackInSlot(INPUT_START+7, 0, GuiItems.ITEM_GUI_XTERM_EMPTY.getStack());
-            this.setStackInSlot(INPUT_START+8, 0, GuiItems.ITEM_GUI_XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_DRAWOVERRIDE_L, 0, Registered.GUI_ITEMS.XTERM_L.getStack());
+            this.setStackInSlot(INPUT_DRAWOVERRIDE_R, 0, Registered.GUI_ITEMS.XTERM_R.getStack());
+            this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, 0, Registered.GUI_ITEMS.XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+3, 0, Registered.GUI_ITEMS.XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+5, 0, Registered.GUI_ITEMS.XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+6, 0, Registered.GUI_ITEMS.XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+7, 0, Registered.GUI_ITEMS.XTERM_EMPTY.getStack());
+            this.setStackInSlot(INPUT_START+8, 0, Registered.GUI_ITEMS.XTERM_EMPTY.getStack());
             this.sendContentUpdates();
         }
 
@@ -241,9 +246,10 @@ public class XTerm {
         }
 
         private void setOutput(ItemStack mutItemStack, int count) {
+
             if (count == 0) {
                 this.setStackInSlot(RESULT_ID, this.nextRevision(), ItemStack.EMPTY);
-                this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.ITEM_GUI_XTERM_EMPTY.getDefaultStack());
+                this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), Registered.GUI_ITEMS.XTERM_EMPTY.getDefaultStack());
                 return;
             }
 
@@ -266,9 +272,9 @@ public class XTerm {
                 mutItemStack.setCount(1);
                 this.setStackInSlot(RESULT_ID, this.nextRevision(), mutItemStack);
                 switch (magnitude) {
-                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.ITEM_GUI_XTERM_EMPTY.getDefaultStack());
-                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.ITEM_GUI_XTERM_DIGIT_SPECIAL_1K.getDefaultStack());
-                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.ITEM_GUI_XTERM_DIGIT_SPECIAL_1M.getDefaultStack());
+                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), Registered.GUI_ITEMS.XTERM_EMPTY.getDefaultStack());
+                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), Registered.GUI_ITEMS.XTERM_DIGIT_SPECIAL_1K.getDefaultStack());
+                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), Registered.GUI_ITEMS.XTERM_DIGIT_SPECIAL_1M.getDefaultStack());
                 }
                 return;
             }
@@ -277,9 +283,9 @@ public class XTerm {
                 mutItemStack.setCount(numberToDraw);
                 this.setStackInSlot(RESULT_ID, this.nextRevision(), mutItemStack);
                 switch (magnitude) {
-                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.ITEM_GUI_XTERM_EMPTY.getDefaultStack());
-                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.ITEM_GUI_XTERM_DIGIT_SPECIAL_K.getDefaultStack());
-                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.ITEM_GUI_XTERM_DIGIT_SPECIAL_M.getDefaultStack());
+                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), Registered.GUI_ITEMS.XTERM_EMPTY.getDefaultStack());
+                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), Registered.GUI_ITEMS.XTERM_DIGIT_SPECIAL_K.getDefaultStack());
+                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), Registered.GUI_ITEMS.XTERM_DIGIT_SPECIAL_M.getDefaultStack());
                 }
                 return;
             }
@@ -291,9 +297,9 @@ public class XTerm {
             if (doubleDigits == 0) {
                 this.setStackInSlot(RESULT_ID, this.nextRevision(), mutItemStack);
                 switch (magnitude) {
-                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_N00_S.get(hundredDigit).getDefaultStack());
-                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_N00_K.get(hundredDigit).getDefaultStack());
-                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_N00_M.get(hundredDigit).getDefaultStack());
+                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_N00_S.get(hundredDigit).getDefaultStack());
+                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_N00_K.get(hundredDigit).getDefaultStack());
+                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_N00_M.get(hundredDigit).getDefaultStack());
                 }
                 return;
             }
@@ -301,18 +307,18 @@ public class XTerm {
             if (doubleDigits < 10) {
                 this.setStackInSlot(RESULT_ID, this.nextRevision(), mutItemStack);
                 switch (magnitude) {
-                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_N0X_S.get(hundredDigit).getDefaultStack());
-                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_N0X_K.get(hundredDigit).getDefaultStack());
-                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_N0X_M.get(hundredDigit).getDefaultStack());
+                    case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_N0X_S.get(hundredDigit).getDefaultStack());
+                    case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_N0X_K.get(hundredDigit).getDefaultStack());
+                    case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_N0X_M.get(hundredDigit).getDefaultStack());
                 }
                 return;
             }
 
             this.setStackInSlot(RESULT_ID, this.nextRevision(), mutItemStack);
             switch (magnitude) {
-                case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_NXX_S.get(hundredDigit).getDefaultStack());
-                case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_NXX_K.get(hundredDigit).getDefaultStack());
-                case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), GuiItems.COLLECTION_ITEM_GUI_XTERM_DIGIT_NXX_M.get(hundredDigit).getDefaultStack());
+                case 0 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_NXX_S.get(hundredDigit).getDefaultStack());
+                case 1 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_NXX_K.get(hundredDigit).getDefaultStack());
+                case 2 -> this.setStackInSlot(INPUT_DRAWOVERRIDE_COUNT, this.nextRevision(), XTermDigits.COLLECTION_XTERM_DIGIT_NXX_M.get(hundredDigit).getDefaultStack());
             }
         }
 
