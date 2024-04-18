@@ -23,7 +23,7 @@ import net.wilux.objects.base.block.FactoryBlock;
 import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
 import net.wilux.objects.base.item.GuiItem;
 import net.wilux.objects.base.item.PolyBlockItem;
-import net.wilux.objects.xterm.XTerm;
+import net.wilux.objects.XTerm;
 
 import static net.wilux.PolyWorks.MOD_ID;
 import static net.wilux.register.Registered.PolyRegisters.*;

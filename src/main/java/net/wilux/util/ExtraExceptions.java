@@ -6,4 +6,8 @@ public final class ExtraExceptions {
     public static class ProbablyImpossibleException extends RuntimeException{}
 
     public static class DoNotCallException extends RuntimeException {}
+
+    public static void debugCrash(String why) {
+        throw new RuntimeException(why);
+    }
 }

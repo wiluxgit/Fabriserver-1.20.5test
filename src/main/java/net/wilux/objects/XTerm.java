@@ -1,4 +1,4 @@
-package net.wilux.objects.xterm;
+package net.wilux.objects;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.block.*;
@@ -63,6 +63,8 @@ public class XTerm {
     }
 
     public static class XTermSpoofer extends RecipeSpoofHandler.RecipeSpoof<ShapelessRecipe> {
+        private static final int MAX_COUNT_PER_ITEM = 999_999;
+
         private final Map<Identifier, StoredStack> items;
         private final RecipeBookOptions recipeBookSettings;
 
@@ -86,7 +88,7 @@ public class XTerm {
 
             this.items = tempItems.stream().collect(Collectors.toMap(
                 x -> new Identifier(PolyWorks.MOD_ID, "xterm."+x.getLeft().getItem().getTranslationKey()),
-                x -> new StoredStack(x.getLeft(), x.getRight())
+                x -> new StoredStack(x.getLeft(), x.getRight(), MAX_COUNT_PER_ITEM)
             ));
         }
 
@@ -99,8 +101,7 @@ public class XTerm {
             splayer.networkHandler.sendPacket(unlockRecipes);
         }
 
-        record InsertResult(boolean didInsert, int nItemsInsideAfterInsert){}
-        public InsertResult insert(ItemStack itemStack) {
+        public @Nullable StoredStack.StackInTransfer insertAsManyAsPossible(ItemStack itemStack) {
             // Todo? this method could be significatly faster
             Map.Entry<Identifier, StoredStack> matchingEntry = this.items.entrySet().stream()
                     .filter(entry -> ItemStack.canCombine(itemStack, entry.getValue().stackCopy()))
@@ -109,17 +110,21 @@ public class XTerm {
 
             if (matchingEntry == null) {
                 PolyWorks.LOGGER.warn("Tried inserting a new item, that is not supported yet");
-                return new InsertResult(false, -1);
+                return null;
             }
 
             StoredStack matchingStoredStack = matchingEntry.getValue();
             Identifier matchingIdentifier = matchingEntry.getKey();
-            var nItemsAfterInsert = matchingStoredStack.insert(itemStack.getCount());
+            StoredStack.StackInTransfer transfer = matchingStoredStack.insert(itemStack);
+            if (transfer == null) {
+                return null;
+            }
+
             reRemember(matchingIdentifier);
-            return new InsertResult(true, nItemsAfterInsert);
+            return transfer;
         }
 
-        public @Nullable StoredStack.StackTransfer takeLargestStackIfExists(Identifier recipe) {
+        public @Nullable StoredStack.StackOutTransfer takeLargestStackIfExists(Identifier recipe) {
             var storedStack = this.items.get(recipe);
             if (storedStack == null) {
                 PolyWorks.LOGGER.warn("Player tried to take item that is not contained");
@@ -208,7 +213,7 @@ public class XTerm {
             var stackTransfer = spoofer.takeLargestStackIfExists(recipe);
             if (stackTransfer == null) return;
 
-            ItemStack itemStackToTransfer = stackTransfer.itemStack;
+            ItemStack itemStackToTransfer = stackTransfer.itemStackToExtract;
             ItemStack visualStackCopy = itemStackToTransfer.copyWithCount(1);
             boolean tookItem = false;
             if (craftAll) {
@@ -227,25 +232,30 @@ public class XTerm {
             PolyWorks.LOGGER.info("Transfered items out of terminal. "+remainingItems+" now remain.");
 
             if (remainingItems > 0) {
-                this.setOutput(visualStackCopy, remainingItems);
+                this.setVisualOutput(visualStackCopy, remainingItems);
             } else {
                 this.spoofer.forget(recipe); // should be handled elsewhere?
-                this.setOutput(ItemStack.EMPTY, 0);
+                this.setVisualOutput(ItemStack.EMPTY, 0);
             }
 
             this.sendContentUpdates();
         }
 
-        private boolean insert(ItemStack is) {
-            var result = spoofer.insert(is);
-            if (!result.didInsert) {
+        /**
+         *
+         * @param mutItemStack items to take from
+         * @return wether any items where inserted
+         */
+        private boolean insertAsManyAsPossible(ItemStack mutItemStack) {
+            var result = spoofer.insertAsManyAsPossible(mutItemStack);
+            if (result == null) {
                 return false;
             }
-            this.setOutput(is.copy(), result.nItemsInsideAfterInsert);
+            this.setVisualOutput(mutItemStack.copy(), result.resolveWith(true, mutItemStack));
             return true;
         }
 
-        private void setOutput(ItemStack mutItemStack, int count) {
+        private void setVisualOutput(ItemStack mutItemStack, int count) {
 
             if (count == 0) {
                 this.setStackInSlot(RESULT_ID, this.nextRevision(), ItemStack.EMPTY);
@@ -332,7 +342,7 @@ public class XTerm {
 
             PolyWorks.LOGGER.info("Relevant Quickmove with slot="+slotId);
             ItemStack slotStack = slot.getStack();
-            var insertOk = this.insert(slotStack);
+            var insertOk = this.insertAsManyAsPossible(slotStack);
             if (!insertOk) return ItemStack.EMPTY;
 
             PolyWorks.LOGGER.info("Quickmove success!"+slotId);
