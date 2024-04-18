@@ -1,4 +1,4 @@
-package net.wilux.objects.base;
+package net.wilux.objects.base.item;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;

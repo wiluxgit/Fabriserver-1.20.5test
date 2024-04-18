@@ -1,42 +1,28 @@
-package net.wilux.objects.base.horizontal;
+package net.wilux.objects.base.block;
 
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PolyHorizontalFacingBlockWithEntity extends BlockWithEntity implements PolymerTexturedBlock {
-    // BlockWithEntity methods
-    @Nullable @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return null;
-    }
-
+public class PolyHorizontalFacingBlock extends Block implements PolymerTexturedBlock {
     // HorizontalFacingBlock methods
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    private static final MapCodec<? extends PolyHorizontalFacingBlockWithEntity> CODEC = createCodec(PolyHorizontalFacingBlockWithEntity::new);
+    private final MapCodec<? extends PolyHorizontalFacingBlock> CODEC;
 
-    private PolyHorizontalFacingBlockWithEntity(Settings settings) {
-        super(settings);
-        setDefaultState(getDefaultState().with(FACING, Direction.NORTH));
-    }
     @Override protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
         builder.add(FACING);
     }
-    @Override protected MapCodec<? extends PolyHorizontalFacingBlockWithEntity> getCodec() {
+    @Override protected MapCodec<? extends PolyHorizontalFacingBlock> getCodec() {
         return CODEC;
     }
     @Override public BlockState getPlacementState(ItemPlacementContext ctx) {
@@ -46,8 +32,10 @@ public class PolyHorizontalFacingBlockWithEntity extends BlockWithEntity impleme
 
     // Polymer methods
     protected Map<Direction, BlockState> dirPolymerState;
-    public PolyHorizontalFacingBlockWithEntity(Settings settings, BlockState northPolymerState, BlockState eastPolymerState, BlockState southPolymerState, BlockState westPolymerState) {
-        this(settings);
+    public PolyHorizontalFacingBlock(Settings settings, BlockState northPolymerState, BlockState eastPolymerState, BlockState southPolymerState, BlockState westPolymerState) {
+        super(settings);
+        this.CODEC = createCodec((Settings __) -> this);
+        setDefaultState(getDefaultState().with(FACING, Direction.NORTH));
         dirPolymerState = new HashMap<>();
         dirPolymerState.put(Direction.NORTH, northPolymerState);
         dirPolymerState.put(Direction.EAST, eastPolymerState);

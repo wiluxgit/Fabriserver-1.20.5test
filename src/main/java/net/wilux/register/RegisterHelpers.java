@@ -3,22 +3,28 @@ package net.wilux.register;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockModel;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
+import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.wilux.PolyWorks;
-import net.wilux.objects.base.FactoryBlock;
-import net.wilux.objects.base.horizontal.PolyHorizontalFacingBlock;
+import net.wilux.objects.Crate;
+import net.wilux.objects.base.block.FactoryBlock;
+import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
 
 import static net.wilux.PolyWorks.MOD_ID;
 
-public class RegisterHelpers {
+public final class RegisterHelpers {
     public static void registerAll() {
+        // Register block entities
+        registerWithPolyBlockEntity(new Identifier(MOD_ID, "entity_crate"), Registered.CRATE.BLOCK_ENTITY_TYPE);
+
         // Register blocks and items
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "watering_can"), Registered.WATERING_CAN.ITEM);
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "xterm"), Registered.XTERM.BLOCK);
@@ -126,31 +132,8 @@ public class RegisterHelpers {
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_digit_special_1m"), Registered.GUI_ITEMS.XTERM_DIGIT_SPECIAL_1M);
     }
 
-    public static PolymerModelData polymerModelData(Item itemType, String assetPath) {
-        return PolymerResourcePackUtils.requestModel(itemType, new Identifier(MOD_ID, assetPath));
-    }
-    public static BlockState polymerBlockData(BlockModelType blockModelType, String assetPath){
-        return polymerBlockData(blockModelType, 0, 0, assetPath);
-    }
-    public static BlockState polymerBlockData(BlockModelType blockModelType, int x, int y, String assetPath){
-        BlockState bs = PolymerBlockResourceUtils.requestBlock(blockModelType, PolymerBlockModel.of(new Identifier(MOD_ID, assetPath), x ,y));
-        if (bs == null) throw new RuntimeException("Could not register model, polymer is out of ids, this mod can not work in that case");
-        return bs;
-    }
-    public static PolyHorizontalFacingBlock polyHorizontalFacingBlock(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
-        return new PolyHorizontalFacingBlock(settings,
-                polymerBlockData(blockModelType, 0, 0, assetPath),
-                polymerBlockData(blockModelType, 0, 90, assetPath),
-                polymerBlockData(blockModelType, 0, 180,  assetPath),
-                polymerBlockData(blockModelType, 0, 270,assetPath)
-        );
-    }
-    public static FactoryBlock polyFactory(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
-        return new FactoryBlock(settings,
-                polymerBlockData(blockModelType, 0, 0, assetPath),
-                polymerBlockData(blockModelType, 0, 90, assetPath),
-                polymerBlockData(blockModelType, 0, 180,  assetPath),
-                polymerBlockData(blockModelType, 0, 270,assetPath)
-        );
+    private static void registerWithPolyBlockEntity(Identifier id, BlockEntityType<? extends BlockEntity> entityType) {
+        var x = Registry.register(Registries.BLOCK_ENTITY_TYPE, id, entityType);
+        PolymerBlockUtils.registerBlockEntity(x);
     }
 }

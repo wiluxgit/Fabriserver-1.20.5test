@@ -25,14 +25,29 @@ rotx = np.asarray([
     [0, sin(rx),  cos(rx), 0],
     [0, 0,        0,       1],
 ])
+m = 20
+flatten = np.asarray([
+    [m, 0,  0, 0],
+    [0, m,  0, 0],
+    [0, 0,  1, 0],
+    [0, 0,  0, m],
+])
+s = 0.35
 scale = np.asarray([
-    [0.4, 0, 0, 0],
-    [0, 0.4, 0, 0.1],
-    [0, 0, 0.01, 0.48],
+    [s, 0, 0, 0],
+    [0, s, 0, 0],
+    [0, 0, s, 0],
+    [0, 0, 0, 1],
+])
+t = 0.5 - (1/16)/2
+translate = np.asarray([
+    [1, 0, 0, 0],
+    [0, 1, 0, 0.1],
+    [0, 0, 1, t],
     [0, 0, 0, 1],
 ])
 
-A = (scale @ rotx @ roty)
+A = translate @ scale @ flatten @ rotx @ roty
 
 nbt = """{
     transformation:"""+fmt(A)+""",

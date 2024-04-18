@@ -1,24 +1,32 @@
 package net.wilux.register;
 
 import eu.pb4.polymer.blocks.api.BlockModelType;
+import eu.pb4.polymer.blocks.api.PolymerBlockModel;
+import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.util.Identifier;
 import net.wilux.objects.Crate;
 import net.wilux.objects.WateringCan;
 import net.wilux.objects.WireSpool;
-import net.wilux.objects.base.GuiItem;
-import net.wilux.objects.base.PolyBlockItem;
+import net.wilux.objects.base.block.FactoryBlock;
+import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
+import net.wilux.objects.base.item.GuiItem;
+import net.wilux.objects.base.item.PolyBlockItem;
 import net.wilux.objects.xterm.XTerm;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static net.wilux.register.RegisterHelpers.*;
+import static net.wilux.PolyWorks.MOD_ID;
+import static net.wilux.register.Registered.PolyRegisters.*;
 
 public class Registered {
     public static final class WATERING_CAN {
@@ -55,13 +63,14 @@ public class Registered {
     }
 
     public static final class CRATE {
-        public static final Block BLOCK = new Crate(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK),
+        public static final Block BLOCK = new Crate.CrateBlock(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK),
                 polymerBlockData(BlockModelType.FULL_BLOCK, 0, 0, "block/crate"),
                 polymerBlockData(BlockModelType.FULL_BLOCK, 0, 90, "block/crate"),
                 polymerBlockData(BlockModelType.FULL_BLOCK, 0, 180,  "block/crate"),
                 polymerBlockData(BlockModelType.FULL_BLOCK, 0, 270,"block/crate")
         );
         public static final BlockItem ITEM = new PolyBlockItem(BLOCK, new FabricItemSettings(), polymerModelData(Items.BARRIER, "item/crate"));
+        public static final BlockEntityType<Crate.CrateBlockEntity> BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(Crate.CrateBlockEntity::new, BLOCK).build();
     }
 
     public static final class WIRE_SPOOL {
@@ -158,5 +167,35 @@ public class Registered {
         public static final GuiItem XTERM_DIGIT_SPECIAL_M = new GuiItem(new FabricItemSettings(), polymerModelData(Items.CLOCK, "guiitem/digit/digit_special_m"));
         public static final GuiItem XTERM_DIGIT_SPECIAL_1K = new GuiItem(new FabricItemSettings(), polymerModelData(Items.CLOCK, "guiitem/digit/digit_special_1k"));
         public static final GuiItem XTERM_DIGIT_SPECIAL_1M = new GuiItem(new FabricItemSettings(), polymerModelData(Items.CLOCK, "guiitem/digit/digit_special_1m"));
+    }
+
+    protected static final class PolyRegisters {
+        static PolymerModelData polymerModelData(Item itemType, String assetPath) {
+            return PolymerResourcePackUtils.requestModel(itemType, new Identifier(MOD_ID, assetPath));
+        }
+        static BlockState polymerBlockData(BlockModelType blockModelType, String assetPath){
+            return polymerBlockData(blockModelType, 0, 0, assetPath);
+        }
+        static BlockState polymerBlockData(BlockModelType blockModelType, int x, int y, String assetPath){
+            BlockState bs = PolymerBlockResourceUtils.requestBlock(blockModelType, PolymerBlockModel.of(new Identifier(MOD_ID, assetPath), x ,y));
+            if (bs == null) throw new RuntimeException("Could not register model, polymer is out of ids, this mod can not work in that case");
+            return bs;
+        }
+        static PolyHorizontalFacingBlock polyHorizontalFacingBlock(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
+            return new PolyHorizontalFacingBlock(settings,
+                    polymerBlockData(blockModelType, 0, 0, assetPath),
+                    polymerBlockData(blockModelType, 0, 90, assetPath),
+                    polymerBlockData(blockModelType, 0, 180,  assetPath),
+                    polymerBlockData(blockModelType, 0, 270,assetPath)
+            );
+        }
+        static FactoryBlock polyFactory(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
+            return new FactoryBlock(settings,
+                    polymerBlockData(blockModelType, 0, 0, assetPath),
+                    polymerBlockData(blockModelType, 0, 90, assetPath),
+                    polymerBlockData(blockModelType, 0, 180,  assetPath),
+                    polymerBlockData(blockModelType, 0, 270,assetPath)
+            );
+        }
     }
 }
