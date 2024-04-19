@@ -1,5 +1,6 @@
 package net.wilux.stackstorage;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.wilux.PolyWorks;
 import org.jetbrains.annotations.Nullable;

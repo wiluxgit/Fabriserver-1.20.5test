@@ -6,7 +6,17 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.world.World;
 import net.wilux.objects.XTerm;
+import net.wilux.objects.base.block.IOverrideLeftClickBlock;
+import net.wilux.objects.base.block.IOverrideRightClickBlock;
 import net.wilux.recipespoofing.RecipeSpoofHandler;
 import net.wilux.register.RegisterHelpers;
 import org.slf4j.Logger;
@@ -32,5 +42,9 @@ public class PolyWorks implements ModInitializer {
 
 		// Register minecraft blocks/items/etc.
 		RegisterHelpers.registerAll();
+
+		// Register event handles
+		AttackBlockCallback.EVENT.register(IOverrideLeftClickBlock::eventHandler);
+		UseBlockCallback.EVENT.register(IOverrideRightClickBlock::eventHandler);
 	}
 }
