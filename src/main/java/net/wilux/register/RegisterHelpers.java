@@ -15,32 +15,30 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.wilux.objects.Crate;
-import net.wilux.objects.base.block.FactoryBlock;
-import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
 
 import static net.wilux.PolyWorks.MOD_ID;
 
 public final class RegisterHelpers {
     public static void registerAll() {
-        // Register block entities
-        registerWithPolyBlockEntity(new Identifier(MOD_ID, "entity_crate"), Registered.CRATE.BLOCK_ENTITY_TYPE);
-
         // Register blocks and items
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "watering_can"), Registered.WATERING_CAN.ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "wire_spool"), Registered.WIRE_SPOOL.ITEM);
+
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "xterm"), Registered.XTERM.BLOCK);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "xterm"), Registered.XTERM.ITEM);
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "coal_generator"), Registered.MACHINE_COAL_GENERATOR.BLOCK);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "coal_generator"), Registered.MACHINE_COAL_GENERATOR.ITEM);
-        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "furnace"), Registered.MACHINE_ELECTRIC_FURNACE.BLOCK);
-        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "furnace"), Registered.MACHINE_ELECTRIC_FURNACE.ITEM);
+        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "electric_furnace"), Registered.MACHINE_ELECTRIC_FURNACE.BLOCK);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "electric_furnace"), Registered.MACHINE_ELECTRIC_FURNACE.ITEM);
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "grinder"), Registered.MACHINE_GRINDER.BLOCK);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "grinder"), Registered.MACHINE_GRINDER.ITEM);
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "plater"), Registered.MACHINE_PLATER.BLOCK);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "plater"), Registered.MACHINE_PLATER.ITEM);
+        registerWithPolyBlockEntity(new Identifier(MOD_ID, "dummy"), Registered.MACHINE_DUMMY.BLOCK_ENTITY_TYPE_DUMMY_MACHINE);
+
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "crate"), Registered.CRATE.BLOCK);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "crate"), Registered.CRATE.ITEM);
-        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "wirespool"), Registered.WIRE_SPOOL.ITEM);
+        registerWithPolyBlockEntity(new Identifier(MOD_ID, "crate"), Registered.CRATE.BLOCK_ENTITY_TYPE);
 
         // Register gui items
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_left"), Registered.GUI_ITEMS.XTERM_L);

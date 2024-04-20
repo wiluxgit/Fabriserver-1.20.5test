@@ -1,8 +1,5 @@
 package net.wilux.objects;
 
-import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
-import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import net.minecraft.block.*;
@@ -24,6 +21,8 @@ import net.wilux.PolyWorks;
 import net.wilux.objects.base.block.IOverrideLeftClickBlock;
 import net.wilux.objects.base.block.IOverrideRightClickBlock;
 import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
+import net.wilux.objects.base.blockentity.polyattchments.BlockEntityWithAttachments;
+import net.wilux.objects.base.blockentity.polyattchments.BlockAttachment;
 import net.wilux.register.Registered;
 import net.wilux.stackstorage.StoredStack;
 import net.wilux.util.ExtraExceptions;
@@ -33,16 +32,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static net.wilux.util.ServerCast.asServer;
 
 public final class Crate {
-    private record VirtualClientEntities(
-            @NotNull HolderAttachment polyAttachment,
-            @NotNull ItemDisplayElement item,
-            @NotNull TextDisplayElement text
-    ){}
+    private static class CrateDisplayEntities extends BlockAttachment {
+        public final @NotNull ItemDisplayElement item;
+        public final @NotNull TextDisplayElement text;
+        private CrateDisplayEntities(@NotNull ItemDisplayElement item, @NotNull TextDisplayElement text, @NotNull World world, @NotNull BlockPos pos) {
+            super(world, pos);
+            this.elementHolder.addElement(item);
+            this.elementHolder.addElement(text);
+            this.item = item;
+            this.text = text;
+        }
+    }
+
     private static class LastInteraction {
         public @Nullable UUID lastPlayer;
         public long lastTimeMillis;
@@ -52,14 +57,13 @@ public final class Crate {
         }
     }
 
-
-    public static class CrateBlockEntity extends BlockEntity {
+    public static class CrateBlockEntity extends BlockEntityWithAttachments<CrateDisplayEntities> {
         public static final int MAX_ITEM_COUNT = 512; // TODO? limit in other ways
         public static final String EMPTY_MESSAGE = "<empty>";
         public static final int MAX_DOUBLE_CLICK_DELAY_MILLIS = 400; // TODO? make dependent on client time somehow instead
 
         private @Nullable StoredStack ss = null;
-        private @Nullable VirtualClientEntities virtualClientEntities = null;
+        private @Nullable Crate.CrateDisplayEntities crateDisplayEntities = null;
         private final LastInteraction lastRightClickInteraction;
 
         public CrateBlockEntity(BlockPos pos, BlockState state) {
@@ -68,9 +72,9 @@ public final class Crate {
             this.lastRightClickInteraction = new LastInteraction();
         }
 
-        public void tick(Direction direction) { // Kinda stupid this is needed, but world is not accessible in new
+        public void tick(World world, BlockPos pos, BlockState blockState) { // Kinda stupid this is needed, but world is not accessible in new
             assert world != null;
-            if (this.virtualClientEntities == null) this.initializeAttachment(this.world, this.pos, direction);
+            if (this.crateDisplayEntities == null) this.initializeAttachment(world, pos, blockState);
         }
 
         // Player interact methods
@@ -130,16 +134,11 @@ public final class Crate {
         }
 
         // Attachment methods
-        private void removeAttachment() {
-            assert this.virtualClientEntities != null;
-            PolyWorks.LOGGER.info("Kill Virtualentity Crate");
-            this.virtualClientEntities.polyAttachment.destroy();
-            this.virtualClientEntities = null;
-        }
+        @Override
+        public void initializeAttachment(World world, BlockPos pos, BlockState blockState) {
+            assert this.crateDisplayEntities == null;
 
-        private void initializeAttachment(World world, BlockPos pos, Direction direction) {
-            assert this.virtualClientEntities == null;
-
+            Direction direction = blockState.get(CrateBlock.FACING);
             PolyWorks.LOGGER.info("Create Virtualentity Crate");
 
             var rotDegrees = -direction.asRotation();
@@ -165,27 +164,33 @@ public final class Crate {
                     Mtx.scale(0.3)
             ));
 
-            var polyHolder = new ElementHolder();
-            polyHolder.addElement(itemDisplayElement);
-            polyHolder.addElement(textDisplay);
+            this.crateDisplayEntities = new CrateDisplayEntities(itemDisplayElement, textDisplay, asServer(world), pos);
+        }
 
-            this.virtualClientEntities = new VirtualClientEntities(
-                    ChunkAttachment.ofTicking(polyHolder, asServer(world), pos.toCenterPos()),
-                    itemDisplayElement,
-                    textDisplay
-            );
+        @Override
+        public void removeAttachment() {
+            assert this.crateDisplayEntities != null;
+            PolyWorks.LOGGER.info("Kill Virtualentity Crate");
+            this.crateDisplayEntities.destroy();
+            this.crateDisplayEntities = null;
+        }
+
+        @Override
+        public CrateDisplayEntities getAttachment() {
+            return this.crateDisplayEntities;
         }
 
         // BlockEntity
         @Override
         public void markDirty() {
             super.markDirty();
+            assert this.crateDisplayEntities != null;
             if (this.ss == null || this.ss.count() == 0) {
-                this.virtualClientEntities.item.setItem(Items.AIR.getDefaultStack());
-                this.virtualClientEntities.text.setText(Text.of(EMPTY_MESSAGE));
+                this.crateDisplayEntities.item.setItem(Items.AIR.getDefaultStack());
+                this.crateDisplayEntities.text.setText(Text.of(EMPTY_MESSAGE));
             } else {
-                this.virtualClientEntities.item.setItem(ss.stackCopy());
-                this.virtualClientEntities.text.setText(Text.of(""+this.ss.count()));
+                this.crateDisplayEntities.item.setItem(ss.stackCopy());
+                this.crateDisplayEntities.text.setText(Text.of(""+this.ss.count()));
             }
         }
 
@@ -238,7 +243,7 @@ public final class Crate {
             return (World l_world, BlockPos l_pos1, BlockState l_state1, T t) -> {
                 if (type ==  t.getType()) {
                     if (t instanceof CrateBlockEntity crateBlockEntity) {
-                        crateBlockEntity.tick(l_state1.get(FACING));
+                        crateBlockEntity.tick(l_world, l_pos1, l_state1);
                         return;
                     }
                 }

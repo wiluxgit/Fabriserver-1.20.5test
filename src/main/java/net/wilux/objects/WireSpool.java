@@ -3,9 +3,6 @@ package net.wilux.objects;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
-import eu.pb4.polymer.virtualentity.api.elements.MobAnchorElement;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,7 +10,8 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.wilux.PolyWorks;
-import net.wilux.objects.base.block.ElectricityConnector;
+import net.wilux.objects.base.blockentity.IWireConnector;
+import net.wilux.objects.base.blockentity.polyattchments.BlockEntityWithAttachments;
 import org.jetbrains.annotations.Nullable;
 
 import static net.wilux.util.ServerCast.asServer;
@@ -33,19 +31,14 @@ public class WireSpool extends Item implements PolymerItem {
         var block = world.getBlockState(clickedPoint).getBlock();
         var player = asServer(context.getPlayer(), world);
 
-        PolyWorks.LOGGER.info("Used spool");
-        if (!(block instanceof ElectricityConnector electricityConnector)) {
+        if (!(block instanceof IWireConnector wireConnector)) {
+            PolyWorks.LOGGER.info("Used spool on: nothing");
             return ActionResult.PASS;
         }
-        PolyWorks.LOGGER.info("Is Cool spool:"+electricityConnector);
+        PolyWorks.LOGGER.info("Used spool on: "+ wireConnector);
+        BlockEntityWithAttachments<?> blockEntityWithAttachments = wireConnector.getEntity(context.getWorld(), context.getBlockPos());
 
-        var holder = new ElementHolder();
-        var wireTarget = new MobAnchorElement();
-        wireTarget.setGlowing(true);
-        holder.addElement(wireTarget);
-        ChunkAttachment.of(holder, world, clickedPoint);
-
-        return ActionResult.CONSUME;
+        return ActionResult.SUCCESS;
     }
 
     @Override

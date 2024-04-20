@@ -1,5 +1,6 @@
 package net.wilux.register;
 
+import com.mojang.datafixers.util.Function3;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockModel;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
@@ -11,15 +12,17 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.wilux.objects.Crate;
 import net.wilux.objects.WateringCan;
 import net.wilux.objects.WireSpool;
-import net.wilux.objects.base.block.FactoryBlock;
+import net.wilux.objects.base.block.Machine;
 import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
 import net.wilux.objects.base.item.GuiItem;
 import net.wilux.objects.base.item.PolyBlockItem;
@@ -44,22 +47,28 @@ public class Registered {
     }
 
     public static final class MACHINE_COAL_GENERATOR {
-        public static final Block BLOCK = polyFactory(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/coal_generator");
+        public static final Block BLOCK = polyDummyMachine(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/coal_generator");
         public static final BlockItem ITEM = new PolyBlockItem(BLOCK, new FabricItemSettings(), polymerModelData(Items.BARRIER, "item/machine/coal_generator"));
     }
 
     public static final class MACHINE_ELECTRIC_FURNACE {
-        public static final Block BLOCK = polyFactory(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/electric_furnace");
+        public static final Block BLOCK = polyDummyMachine(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/electric_furnace");
         public static final BlockItem ITEM = new PolyBlockItem(BLOCK, new FabricItemSettings(), polymerModelData(Items.BARRIER, "item/machine/electric_furnace"));
     }
     public static final class MACHINE_GRINDER {
-        public static final Block BLOCK = polyFactory(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/grinder");
+        public static final Block BLOCK = polyDummyMachine(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/grinder");
         public static final BlockItem ITEM = new PolyBlockItem(BLOCK, new FabricItemSettings(), polymerModelData(Items.BARRIER, "item/machine/grinder"));
     }
 
     public static final class MACHINE_PLATER {
-        public static final Block BLOCK = polyFactory(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/plater");
+        public static final Block BLOCK = polyDummyMachine(FabricBlockSettings.copyOf(Blocks.NOTE_BLOCK), BlockModelType.FULL_BLOCK, "block/machine/plater");
         public static final BlockItem ITEM = new PolyBlockItem(BLOCK, new FabricItemSettings(), polymerModelData(Items.BARRIER, "item/machine/plater"));
+    }
+
+    public static final class MACHINE_DUMMY {
+        public static BlockEntityType<Machine.DummyMachineBlockEntity> BLOCK_ENTITY_TYPE_DUMMY_MACHINE = FabricBlockEntityTypeBuilder.create(Machine.DummyMachineBlockEntity::new,
+                XTERM.BLOCK, MACHINE_COAL_GENERATOR.BLOCK, MACHINE_ELECTRIC_FURNACE.BLOCK, MACHINE_GRINDER.BLOCK, MACHINE_PLATER.BLOCK
+        ).build();
     }
 
     public static final class CRATE {
@@ -74,7 +83,7 @@ public class Registered {
     }
 
     public static final class WIRE_SPOOL {
-        public static final Item ITEM = new WireSpool(new FabricItemSettings(), polymerModelData(Items.STICK, "item/todo"));
+        public static final Item ITEM = new WireSpool(new FabricItemSettings(), polymerModelData(Items.STICK, "item/wire_spool"));
     }
 
     public static final class GUI_ITEMS {
@@ -189,8 +198,8 @@ public class Registered {
                     polymerBlockData(blockModelType, 0, 270,assetPath)
             );
         }
-        static FactoryBlock polyFactory(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
-            return new FactoryBlock(settings,
+        static Machine.DummyMachineBlock polyDummyMachine(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
+            return new Machine.DummyMachineBlock(settings,
                     polymerBlockData(blockModelType, 0, 0, assetPath),
                     polymerBlockData(blockModelType, 0, 90, assetPath),
                     polymerBlockData(blockModelType, 0, 180,  assetPath),
