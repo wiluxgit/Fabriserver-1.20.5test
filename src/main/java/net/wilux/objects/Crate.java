@@ -54,9 +54,9 @@ public final class Crate {
 
 
     public static class CrateBlockEntity extends BlockEntity {
-        public final int MAX_ITEM_COUNT = 512; // TODO? limit in other ways
-        public final String EMPTY_MESSAGE = "<empty>";
-        public final int MAX_DOUBLE_CLICK_DELAY_MILLIS = 400; // TODO? make dependent on client time somehow instead
+        public static final int MAX_ITEM_COUNT = 512; // TODO? limit in other ways
+        public static final String EMPTY_MESSAGE = "<empty>";
+        public static final int MAX_DOUBLE_CLICK_DELAY_MILLIS = 400; // TODO? make dependent on client time somehow instead
 
         private @Nullable StoredStack ss = null;
         private @Nullable VirtualClientEntities virtualClientEntities = null;
@@ -127,18 +127,6 @@ public final class Crate {
                 inTransfer.resolveWith(true, handStack);
                 return dirtySuccess();
             }
-        }
-
-        private ActionResult insertAllFromPlayer(@NotNull ServerPlayerEntity player) {
-            assert ss != null;
-            ItemStack stackInside = this.ss.stackCopy();
-            for (ItemStack matchingPlayerStack: player.getInventory().main.stream().filter((i) -> ItemStack.canCombine(i, stackInside)).toList()){
-                var inTransfer = this.ss.insert(matchingPlayerStack);
-                if (inTransfer == null) return ActionResult.CONSUME;
-
-                inTransfer.resolveWith(true, matchingPlayerStack);
-            }
-            return dirtySuccess();
         }
 
         // Attachment methods
