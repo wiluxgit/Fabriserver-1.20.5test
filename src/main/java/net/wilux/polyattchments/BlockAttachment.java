@@ -1,4 +1,4 @@
-package net.wilux.objects.base.blockentity.polyattchments;
+package net.wilux.polyattchments;
 
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
@@ -13,7 +13,7 @@ public abstract class BlockAttachment {
     protected final @NotNull HolderAttachment chunkAttachment;
     protected final @NotNull ElementHolder elementHolder;
 
-    protected BlockAttachment(World world, BlockPos pos) {
+    protected BlockAttachment(@NotNull World world, @NotNull BlockPos pos) {
         this.elementHolder =  new ElementHolder();
         this.chunkAttachment = ChunkAttachment.ofTicking(this.elementHolder, asServer(world), pos.toCenterPos());
     }

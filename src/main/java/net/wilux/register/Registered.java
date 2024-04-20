@@ -19,14 +19,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.wilux.objects.Crate;
-import net.wilux.objects.WateringCan;
-import net.wilux.objects.WireSpool;
+import net.wilux.objects.*;
 import net.wilux.objects.base.block.Machine;
 import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
 import net.wilux.objects.base.item.GuiItem;
 import net.wilux.objects.base.item.PolyBlockItem;
-import net.wilux.objects.XTerm;
 
 import static net.wilux.PolyWorks.MOD_ID;
 import static net.wilux.register.Registered.PolyRegisters.*;
@@ -66,7 +63,7 @@ public class Registered {
     }
 
     public static final class MACHINE_DUMMY {
-        public static BlockEntityType<Machine.DummyMachineBlockEntity> BLOCK_ENTITY_TYPE_DUMMY_MACHINE = FabricBlockEntityTypeBuilder.create(Machine.DummyMachineBlockEntity::new,
+        public static BlockEntityType<DummyMachine.DummyMachineBlockEntity> BLOCK_ENTITY_TYPE_DUMMY_MACHINE = FabricBlockEntityTypeBuilder.create(DummyMachine.DummyMachineBlockEntity::new,
                 XTERM.BLOCK, MACHINE_COAL_GENERATOR.BLOCK, MACHINE_ELECTRIC_FURNACE.BLOCK, MACHINE_GRINDER.BLOCK, MACHINE_PLATER.BLOCK
         ).build();
     }
@@ -198,8 +195,8 @@ public class Registered {
                     polymerBlockData(blockModelType, 0, 270,assetPath)
             );
         }
-        static Machine.DummyMachineBlock polyDummyMachine(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
-            return new Machine.DummyMachineBlock(settings,
+        static DummyMachine.DummyMachineBlock polyDummyMachine(FabricBlockSettings settings, BlockModelType blockModelType, String assetPath) {
+            return new DummyMachine.DummyMachineBlock(settings,
                     polymerBlockData(blockModelType, 0, 0, assetPath),
                     polymerBlockData(blockModelType, 0, 90, assetPath),
                     polymerBlockData(blockModelType, 0, 180,  assetPath),

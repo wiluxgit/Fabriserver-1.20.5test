@@ -21,8 +21,8 @@ import net.wilux.PolyWorks;
 import net.wilux.objects.base.block.IOverrideLeftClickBlock;
 import net.wilux.objects.base.block.IOverrideRightClickBlock;
 import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
-import net.wilux.objects.base.blockentity.polyattchments.BlockEntityWithAttachments;
-import net.wilux.objects.base.blockentity.polyattchments.BlockAttachment;
+import net.wilux.objects.base.blockentity.BlockEntityWithAttachments;
+import net.wilux.polyattchments.BlockAttachment;
 import net.wilux.register.Registered;
 import net.wilux.stackstorage.StoredStack;
 import net.wilux.util.ExtraExceptions;
@@ -63,18 +63,13 @@ public final class Crate {
         public static final int MAX_DOUBLE_CLICK_DELAY_MILLIS = 400; // TODO? make dependent on client time somehow instead
 
         private @Nullable StoredStack ss = null;
-        private @Nullable Crate.CrateDisplayEntities crateDisplayEntities = null;
+        private @Nullable CrateDisplayEntities crateDisplayEntities = null;
         private final LastInteraction lastRightClickInteraction;
 
         public CrateBlockEntity(BlockPos pos, BlockState state) {
             super(Registered.CRATE.BLOCK_ENTITY_TYPE, pos, state);
             PolyWorks.LOGGER.info("Created Crate");
             this.lastRightClickInteraction = new LastInteraction();
-        }
-
-        public void tick(World world, BlockPos pos, BlockState blockState) { // Kinda stupid this is needed, but world is not accessible in new
-            assert world != null;
-            if (this.crateDisplayEntities == null) this.initializeAttachment(world, pos, blockState);
         }
 
         // Player interact methods
@@ -192,13 +187,6 @@ public final class Crate {
                 this.crateDisplayEntities.item.setItem(ss.stackCopy());
                 this.crateDisplayEntities.text.setText(Text.of(""+this.ss.count()));
             }
-        }
-
-        @Override
-        public void markRemoved() {
-            PolyWorks.LOGGER.info("Broke Crate");
-            removeAttachment();
-            super.markRemoved();
         }
     }
 

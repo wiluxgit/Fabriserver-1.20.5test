@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.wilux.PolyWorks;
 import net.wilux.objects.base.blockentity.IWireConnector;
-import net.wilux.objects.base.blockentity.polyattchments.BlockEntityWithAttachments;
+import net.wilux.objects.base.blockentity.BlockEntityWithAttachments;
 import org.jetbrains.annotations.Nullable;
 
 import static net.wilux.util.ServerCast.asServer;
@@ -36,7 +36,7 @@ public class WireSpool extends Item implements PolymerItem {
             return ActionResult.PASS;
         }
         PolyWorks.LOGGER.info("Used spool on: "+ wireConnector);
-        BlockEntityWithAttachments<?> blockEntityWithAttachments = wireConnector.getEntity(context.getWorld(), context.getBlockPos());
+        BlockEntityWithAttachments<?> blockEntityWithAttachments = wireConnector.getBlockEntity(context.getWorld(), context.getBlockPos());
 
         return ActionResult.SUCCESS;
     }

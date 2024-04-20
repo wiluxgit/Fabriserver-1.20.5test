@@ -129,11 +129,11 @@ public class StoredStack {
 
     @Debug
     private void changed(String why) {
-        PolyWorks.LOGGER.info("modified stored stack because: \""+why+"\". Is now: ["+
+        /*PolyWorks.LOGGER.info("modified stored stack because: \""+why+"\". Is now: ["+
                 "actual=" + this.actualCount + ", " +
                 "inAble=" + this.inAbleCount + ", " +
                 "outAble=" + this.outAbleCount + "]"
-        );
+        );*/
     }
 
     public static class InTransfer {
