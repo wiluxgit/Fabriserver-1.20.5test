@@ -198,7 +198,7 @@ public final class Crate {
         @Override
         public ActionResult leftClick(ServerPlayerEntity player, World world, Hand hand, BlockPos pos, Direction direction) {
             Optional<CrateBlockEntity> blockEntity = world.getBlockEntity(pos, Registered.CRATE.BLOCK_ENTITY_TYPE);
-            if (blockEntity.isEmpty()) ExtraExceptions.debugCrash("block does not have an entity");
+            if (blockEntity.isEmpty()) throw new ExtraExceptions.DebugCrashException("block does not have an entity");
 
             // Ignore left clicks unless it is on the front side
             if(world.getBlockState(pos).get(FACING) != direction) return ActionResult.PASS;
@@ -212,7 +212,7 @@ public final class Crate {
 
             BlockPos pos = hitResult.getBlockPos();
             Optional<CrateBlockEntity> blockEntity = world.getBlockEntity(pos, Registered.CRATE.BLOCK_ENTITY_TYPE);
-            if (blockEntity.isEmpty()) ExtraExceptions.debugCrash("block does not have an entity");
+            if (blockEntity.isEmpty()) throw new ExtraExceptions.DebugCrashException("block does not have an entity");
 
             // Ignore right clicks unless it is on the front side
             if(world.getBlockState(pos).get(FACING) != hitResult.getSide()) return ActionResult.PASS;
@@ -235,7 +235,7 @@ public final class Crate {
                         return;
                     }
                 }
-                ExtraExceptions.debugCrash("block entity has wrong type");
+                throw new ExtraExceptions.DebugCrashException("block entity has wrong type");
             };
         }
     }

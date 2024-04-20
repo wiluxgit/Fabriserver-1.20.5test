@@ -87,8 +87,8 @@ public class XTerm {
             ).map(x -> new Pair<ItemStack, Integer>(new ItemStack(x.getLeft()), x.getRight())).toList();
 
             this.items = tempItems.stream().collect(Collectors.toMap(
-                x -> new Identifier(PolyWorks.MOD_ID, "xterm."+x.getLeft().getItem().getTranslationKey()),
-                x -> new StoredStack(x.getLeft(), x.getRight(), MAX_COUNT_PER_ITEM)
+                kv -> new Identifier(PolyWorks.MOD_ID, "xterm."+kv.getLeft().getItem().getTranslationKey()),
+                kv -> new StoredStack(kv.getLeft(), kv.getRight(), MAX_COUNT_PER_ITEM)
             ));
         }
 
@@ -102,7 +102,7 @@ public class XTerm {
         }
 
         public @Nullable StoredStack.InTransfer insertAsManyAsPossible(ItemStack itemStack) {
-            // Todo? this method could be significatly faster
+            // Todo? this method could be significantly faster
             Map.Entry<Identifier, StoredStack> matchingEntry = this.items.entrySet().stream()
                     .filter(entry -> ItemStack.canCombine(itemStack, entry.getValue().stackCopy()))
                     .findFirst()
@@ -165,7 +165,7 @@ public class XTerm {
     }
 
     public static class XTermScreenHandler extends CraftingScreenHandler {
-        protected static class XTermDigits {
+        protected static final class XTermDigits {
             public static final List<GuiItem> COLLECTION_XTERM_DIGIT_NXX_S = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_1XXS, Registered.GUI_ITEMS.XTERM_DIGIT_2XXS, Registered.GUI_ITEMS.XTERM_DIGIT_3XXS, Registered.GUI_ITEMS.XTERM_DIGIT_4XXS, Registered.GUI_ITEMS.XTERM_DIGIT_5XXS, Registered.GUI_ITEMS.XTERM_DIGIT_6XXS, Registered.GUI_ITEMS.XTERM_DIGIT_7XXS, Registered.GUI_ITEMS.XTERM_DIGIT_8XXS, Registered.GUI_ITEMS.XTERM_DIGIT_9XXS);
             public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N0X_S = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_10XS, Registered.GUI_ITEMS.XTERM_DIGIT_20XS, Registered.GUI_ITEMS.XTERM_DIGIT_30XS, Registered.GUI_ITEMS.XTERM_DIGIT_40XS, Registered.GUI_ITEMS.XTERM_DIGIT_50XS, Registered.GUI_ITEMS.XTERM_DIGIT_60XS, Registered.GUI_ITEMS.XTERM_DIGIT_70XS, Registered.GUI_ITEMS.XTERM_DIGIT_80XS, Registered.GUI_ITEMS.XTERM_DIGIT_90XS);
             public static final List<GuiItem> COLLECTION_XTERM_DIGIT_N00_S = Arrays.asList(null, Registered.GUI_ITEMS.XTERM_DIGIT_100S, Registered.GUI_ITEMS.XTERM_DIGIT_200S, Registered.GUI_ITEMS.XTERM_DIGIT_300S, Registered.GUI_ITEMS.XTERM_DIGIT_400S, Registered.GUI_ITEMS.XTERM_DIGIT_500S, Registered.GUI_ITEMS.XTERM_DIGIT_600S, Registered.GUI_ITEMS.XTERM_DIGIT_700S, Registered.GUI_ITEMS.XTERM_DIGIT_800S, Registered.GUI_ITEMS.XTERM_DIGIT_900S);

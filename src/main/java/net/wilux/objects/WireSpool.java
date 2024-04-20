@@ -33,7 +33,7 @@ public class WireSpool extends Item implements PolymerItem {
 
         if (!(block instanceof IWireConnector wireConnector)) {
             PolyWorks.LOGGER.info("Used spool on: nothing");
-            return ActionResult.PASS;
+            return ActionResult.FAIL;
         }
         PolyWorks.LOGGER.info("Used spool on: "+ wireConnector);
         BlockEntityWithAttachments<?> blockEntityWithAttachments = wireConnector.getBlockEntity(context.getWorld(), context.getBlockPos());

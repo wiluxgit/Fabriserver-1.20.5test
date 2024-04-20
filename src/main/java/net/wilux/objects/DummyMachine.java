@@ -29,7 +29,7 @@ public final class DummyMachine {
 
         private DummyDisplayEntities dummyDisplayEntities = null;
         public DummyMachineBlockEntity(BlockPos pos, BlockState state) {
-            super(Registered.MACHINE_DUMMY.BLOCK_ENTITY_TYPE_DUMMY_MACHINE, pos, state);
+            super(BLOCK_ENTITY_TYPE, pos, state);
             PolyWorks.LOGGER.info("Created Dummy Machine");
         }
 
@@ -68,11 +68,10 @@ public final class DummyMachine {
         public DummyMachineBlockEntity getBlockEntity(World world, BlockPos pos) {
             Optional<? extends BlockEntity> blockEntity = world.getBlockEntity(pos, DummyMachineBlockEntity.BLOCK_ENTITY_TYPE);
             if (blockEntity.isEmpty()) {
-                ExtraExceptions.debugCrash("block has no block entity!");
+                throw new ExtraExceptions.DebugCrashException("block has no block entity!");
             }
             if (!(blockEntity.get() instanceof DummyMachineBlockEntity machineBlockEntity)) {
-                ExtraExceptions.debugCrash("block entity is not a "+ DummyMachineBlockEntity.class.getSimpleName());
-                return null;
+                throw new ExtraExceptions.DebugCrashException("block entity is not a "+ DummyMachineBlockEntity.class.getSimpleName());
             }
             return machineBlockEntity;
         }
@@ -86,7 +85,7 @@ public final class DummyMachine {
                         return;
                     }
                 }
-                ExtraExceptions.debugCrash("block entity has wrong type");
+                throw new ExtraExceptions.DebugCrashException("block entity has wrong type");
             };
         }
     }

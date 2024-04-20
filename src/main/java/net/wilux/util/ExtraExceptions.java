@@ -15,8 +15,4 @@ public final class ExtraExceptions {
         public DebugCrashException(String s) { super(s); }
         public DebugCrashException() { super(); }
     }
-
-    public static void debugCrash(String why) {
-        throw new DebugCrashException(why);
-    }
 }
