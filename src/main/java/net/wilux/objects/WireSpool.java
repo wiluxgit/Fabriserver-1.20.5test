@@ -4,14 +4,18 @@ import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.world.World;
 import net.wilux.PolyWorks;
 import net.wilux.objects.base.blockentity.IWireConnector;
 import net.wilux.objects.base.blockentity.BlockEntityWithAttachments;
+import net.wilux.polyattchments.BlockAttachment;
 import org.jetbrains.annotations.Nullable;
 
 import static net.wilux.util.ServerCast.asServer;
@@ -37,6 +41,7 @@ public class WireSpool extends Item implements PolymerItem {
         }
         PolyWorks.LOGGER.info("Used spool on: "+ wireConnector);
         BlockEntityWithAttachments<?> blockEntityWithAttachments = wireConnector.getBlockEntity(context.getWorld(), context.getBlockPos());
+        BlockAttachment attachment = blockEntityWithAttachments.getAttachment();
 
         return ActionResult.SUCCESS;
     }

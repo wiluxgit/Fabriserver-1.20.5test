@@ -41,8 +41,8 @@ public final class Crate {
         public final @NotNull TextDisplayElement text;
         private CrateDisplayEntities(@NotNull ItemDisplayElement item, @NotNull TextDisplayElement text, @NotNull World world, @NotNull BlockPos pos) {
             super(world, pos);
-            this.elementHolder.addElement(item);
-            this.elementHolder.addElement(text);
+            this.addUnnamedElement(item);
+            this.addUnnamedElement(text);
             this.item = item;
             this.text = text;
         }
