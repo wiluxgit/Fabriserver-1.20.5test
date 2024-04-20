@@ -2,7 +2,11 @@ package net.wilux.stackstorage;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.annotation.Debug;
 import net.wilux.PolyWorks;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static java.lang.Math.max;
@@ -63,7 +67,7 @@ public class StoredStack {
      * @param inStack if item matches increase the count with this much
      * @return Null if the item can not be combined, otherwise InTransfer
      */
-    public @Nullable StoredStack.InTransfer insert(ItemStack inStack) {
+    public @Nullable StoredStack.InTransfer insert(@NotNull ItemStack inStack) {
         if (!ItemStack.canCombine(inStack, this.itemStack)) return null;
         int nItemsInStack = inStack.getCount();
         var nItemsToInsert = min(nItemsInStack, this.inAbleCount);
@@ -71,6 +75,25 @@ public class StoredStack {
         this.inAbleCount -= nItemsToInsert;
         this.changed("insert");
         return new InTransfer(this, this.itemStack.copyWithCount(nItemsToInsert), nItemsRemainingThatShouldRemainInStack);
+    }
+
+    /**
+     * Take all itemstacks of player that matches the stored stack.
+     * @param player to take items from
+     * @return waether any items were taken
+     */
+    public boolean insertAllFromPlayer(@NotNull ServerPlayerEntity player) {
+        ItemStack stackInside = this.stackCopy();
+        boolean anySucceded = false;
+        for (ItemStack matchingPlayerStack: player.getInventory().main.stream().filter((i) -> ItemStack.canCombine(i, stackInside)).toList()){
+            anySucceded = true;
+
+            var inTransfer = this.insert(matchingPlayerStack);
+            if (inTransfer == null) break;
+
+            inTransfer.resolveWith(true, matchingPlayerStack);
+        }
+        return anySucceded;
     }
 
     protected int approveOutTransfer(int nItemsToRemoveFromMe) {
@@ -103,6 +126,8 @@ public class StoredStack {
         assert this.actualCount <= this.maxCount;
         assert this.actualCount >= 0;
     }
+
+    @Debug
     private void changed(String why) {
         PolyWorks.LOGGER.info("modified stored stack because: \""+why+"\". Is now: ["+
                 "actual=" + this.actualCount + ", " +

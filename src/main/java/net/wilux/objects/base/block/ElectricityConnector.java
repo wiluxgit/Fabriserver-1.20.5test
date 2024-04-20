@@ -1,4 +1,4 @@
-package net.wilux.objects.base;
+package net.wilux.objects.base.block;
 
 public interface ElectricityConnector {
 }
