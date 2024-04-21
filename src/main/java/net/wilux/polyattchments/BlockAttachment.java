@@ -14,17 +14,17 @@ import java.util.*;
 import static net.wilux.util.ServerCast.asServer;
 
 public abstract class BlockAttachment {
-    public static final class NamedAttachment<T extends VirtualElement> {
+    public static final class NamedVirtualElement<T extends VirtualElement> {
         private static int typeId = 0;
         private final int id;
 
-        public static <T extends VirtualElement> NamedAttachment<T> create() {
-            return new NamedAttachment<T>();
+        public static <T extends VirtualElement> NamedVirtualElement<T> register() {
+            return new NamedVirtualElement<T>();
         }
 
-        private NamedAttachment() {
+        private NamedVirtualElement() {
             this.id = typeId;
-            NamedAttachment.typeId++;
+            NamedVirtualElement.typeId++;
         }
     }
 
@@ -43,12 +43,19 @@ public abstract class BlockAttachment {
     }
 
     public void destroy() {
+        this.holder.destroy();
         this.chunkAttachment.destroy();
     }
 
     // Extra Attachments
-    public <T extends VirtualElement> VirtualElement putNamedElement(NamedAttachment<T> property, T value) {
-        @Nullable VirtualElement old = this.extraElements.put(property.id, value);
+    /**
+     * Inserts/Overrides attachments
+     * @param namedVirtualElement namedAttachment
+     * @param value Element to add
+     * @return the old VirtualElement, if one existed
+     */
+    public <T extends VirtualElement> VirtualElement putNamedElement(NamedVirtualElement<T> namedVirtualElement, T value) {
+        @Nullable VirtualElement old = this.extraElements.put(namedVirtualElement.id, value);
         if (old != null) {
             this.holder.removeElement(old);
         }
@@ -56,7 +63,7 @@ public abstract class BlockAttachment {
         return old;
     }
 
-    public <T extends VirtualElement> @Nullable T getNamedElement(NamedAttachment<T> property){
+    public <T extends VirtualElement> @Nullable T getNamedElement(NamedVirtualElement<T> property){
         VirtualElement virtualElement = this.extraElements.get(property.id);
         if (virtualElement != null) {
             return (T)virtualElement;
