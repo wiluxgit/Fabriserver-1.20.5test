@@ -15,13 +15,16 @@ import net.minecraft.network.packet.s2c.play.EntityAttachS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.Vec3d;
 import net.wilux.PolyWorks;
 import net.wilux.objects.base.blockentity.IWireConnector;
 import net.wilux.objects.base.blockentity.BlockEntityWithAttachments;
 import net.wilux.polyattchments.BlockAttachment;
 import net.wilux.util.Result;
-import net.wilux.util.dirty.DirtyAble;
+import net.wilux.util.Dirty;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 import static net.wilux.util.ServerCast.asServer;
 import static net.wilux.util.UtilEntityAttachS2CPacket.entityAttachS2CPacketFromIds;
@@ -31,21 +34,28 @@ public class WireSpool extends Item implements PolymerItem {
     final PolymerModelData polymerModelData;
 
     public static class WireEntityVirtualElement extends GenericEntityElement {
-        private final DirtyAble<@Nullable Entity> leashHolder;
+        private final Dirty<@Nullable Entity> leashHolder;
 
         public WireEntityVirtualElement() {
             this.dataTracker.set(EntityTrackedData.SILENT, true);
             this.dataTracker.set(EntityTrackedData.NO_GRAVITY, true);
-            leashHolder = new DirtyAble<>(null);
+            this.dataTracker.set(EntityTrackedData.NAME_VISIBLE, true);
+            this.dataTracker.set(EntityTrackedData.CUSTOM_NAME, Optional.of(Text.of("foo")));
+            this.setOffset(new Vec3d(0, -0.5, 0));
+            this.setInvisible(true);
+            leashHolder = new Dirty<>(null);
         }
 
         public void setLeashHolder(@Nullable Entity entity) {
             leashHolder.set(entity);
         }
+        public @Nullable Entity getLeashHolder() {
+            return leashHolder.get();
+        }
 
         @Override
         protected void sendTrackerUpdates() {
-            if (this.leashHolder.takeIfDirty() instanceof Result.Ok<Entity,?> ok) {
+            if (this.leashHolder.consume() instanceof Result.Ok<Entity,?> ok) {
                 PolyWorks.LOGGER.info("Leash target changed!");
                 @Nullable Entity newLeashHolder = ok.value;
 
@@ -60,7 +70,8 @@ public class WireSpool extends Item implements PolymerItem {
 
         @Override
         protected EntityType<? extends Entity> getEntityType() {
-            return EntityType.PIG;
+            // Class must extend MobEntity or it won't be leash-able
+            return EntityType.VEX;
         }
     }
 
@@ -71,6 +82,8 @@ public class WireSpool extends Item implements PolymerItem {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        // TODO: support multiple connections at the same time?
+
         var world = asServer(context.getWorld());
         var clickedPoint = context.getBlockPos();
         var block = world.getBlockState(clickedPoint).getBlock();
@@ -89,20 +102,21 @@ public class WireSpool extends Item implements PolymerItem {
             return ActionResult.PASS;
         }
 
-        var existingElement = attachment.getNamedElement(WIRE_VIRTUAL_ELEMENT);
-        if (existingElement != null) {
-            PolyWorks.LOGGER.info("SPOOL> Modifying existing entity");
-            existingElement.setLeashHolder(player);
+        @Nullable WireEntityVirtualElement elem = attachment.getNamedElement(WIRE_VIRTUAL_ELEMENT);
+        if (elem == null) {
+            elem = new WireEntityVirtualElement();
+            attachment.putNamedElement(WIRE_VIRTUAL_ELEMENT, elem);
+            PolyWorks.LOGGER.info("SPOOL> Creating Virtual Entity");
+        }
+        PolyWorks.LOGGER.info("SPOOL> Modifying  Virtual Entity");
+
+        // If player is already attached to block, unattach them
+        if (elem.getLeashHolder() == player) {
+            elem.setLeashHolder(null);
             return ActionResult.SUCCESS;
         }
 
-        var elem = new WireEntityVirtualElement();
-        elem.setInvisible(false);
-        elem.setCustomName(Text.of("foo"));
-        elem.setCustomNameVisible(true);
         elem.setLeashHolder(player);
-        attachment.putNamedElement(WIRE_VIRTUAL_ELEMENT, elem);
-
         return ActionResult.SUCCESS;
     }
 
