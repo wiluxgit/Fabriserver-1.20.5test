@@ -1,17 +1,11 @@
 package net.wilux.register;
 
-import eu.pb4.polymer.blocks.api.BlockModelType;
-import eu.pb4.polymer.blocks.api.PolymerBlockModel;
-import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.Item;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -20,6 +14,9 @@ import static net.wilux.PolyWorks.MOD_ID;
 
 public final class RegisterHelpers {
     public static void registerAll() {
+        // Register entities
+        registerServerSideEntity(new Identifier(MOD_ID, "wire_spool"), Registered.WIRE_SPOOL.ENTITY_TYPE);
+
         // Register blocks and items
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "watering_can"), Registered.WATERING_CAN.ITEM);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "wire_spool"), Registered.WIRE_SPOOL.ITEM);
@@ -34,11 +31,11 @@ public final class RegisterHelpers {
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "grinder"), Registered.MACHINE_GRINDER.ITEM);
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "plater"), Registered.MACHINE_PLATER.BLOCK);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "plater"), Registered.MACHINE_PLATER.ITEM);
-        registerWithPolyBlockEntity(new Identifier(MOD_ID, "dummy"), Registered.MACHINE_DUMMY.BLOCK_ENTITY_TYPE_DUMMY_MACHINE);
+        registerServerSideBlockEntity(new Identifier(MOD_ID, "dummy"), Registered.MACHINE_DUMMY.BLOCK_ENTITY_TYPE_DUMMY_MACHINE);
 
         Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "crate"), Registered.CRATE.BLOCK);
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "crate"), Registered.CRATE.ITEM);
-        registerWithPolyBlockEntity(new Identifier(MOD_ID, "crate"), Registered.CRATE.BLOCK_ENTITY_TYPE);
+        registerServerSideBlockEntity(new Identifier(MOD_ID, "crate"), Registered.CRATE.BLOCK_ENTITY_TYPE);
 
         // Register gui items
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_left"), Registered.GUI_ITEMS.XTERM_L);
@@ -131,8 +128,12 @@ public final class RegisterHelpers {
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "itemgui_xterm_digit_special_1m"), Registered.GUI_ITEMS.XTERM_DIGIT_SPECIAL_1M);
     }
 
-    private static void registerWithPolyBlockEntity(Identifier id, BlockEntityType<? extends BlockEntity> entityType) {
+    private static void registerServerSideBlockEntity(Identifier id, BlockEntityType<? extends BlockEntity> entityType) {
         var x = Registry.register(Registries.BLOCK_ENTITY_TYPE, id, entityType);
         PolymerBlockUtils.registerBlockEntity(x);
+    }
+    private static void registerServerSideEntity(Identifier id, EntityType<? extends Entity> entityType) {
+        var x = Registry.register(Registries.ENTITY_TYPE, id, entityType);
+        PolymerEntityUtils.registerType(x);
     }
 }

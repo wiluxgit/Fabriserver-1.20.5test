@@ -21,11 +21,15 @@ public class Dirty<T> {
         return func.apply(this.value);
     }
 
+    public void markDirty() {
+        this.dirty = true;
+    }
+
     public T get() {
         return this.value;
     }
 
-    public Result<T, Exception> consume() {
+    public Result<T, Exception> takeDirty() {
         if (this.dirty) {
             this.dirty = false;
             return new Result.Ok<>(this.value);

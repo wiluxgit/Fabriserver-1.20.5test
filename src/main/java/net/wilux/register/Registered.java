@@ -1,6 +1,5 @@
 package net.wilux.register;
 
-import com.mojang.datafixers.util.Function3;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockModel;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
@@ -9,18 +8,17 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.wilux.objects.*;
-import net.wilux.objects.base.block.Machine;
 import net.wilux.objects.base.block.PolyHorizontalFacingBlock;
 import net.wilux.objects.base.item.GuiItem;
 import net.wilux.objects.base.item.PolyBlockItem;
@@ -80,7 +78,8 @@ public class Registered {
     }
 
     public static final class WIRE_SPOOL {
-        public static final Item ITEM = new WireSpool(new FabricItemSettings(), polymerModelData(Items.STICK, "item/wire_spool"));
+        public static final Item ITEM = new WireSpool.WireSpoolItem(new FabricItemSettings(), polymerModelData(Items.STICK, "item/wire_spool"));
+        public static final EntityType<WireSpool.WireBallEntity> ENTITY_TYPE = FabricEntityTypeBuilder.<WireSpool.WireBallEntity>create().build();
     }
 
     public static final class GUI_ITEMS {
